@@ -1,0 +1,3017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Taelor — Style Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Taelor warm-neutral palette */
+      --color-bg:        #FAF7F3;   /* warm cream white — unified background */
+      --color-page:      #FAF7F3;   /* warm cream white — page background */
+      --color-text:      #1C1814;   /* warm charcoal — primary text */
+      --color-muted:     #8A7D74;   /* warm brown-gray — secondary text */
+      --color-border:    #D9D1C7;   /* warm beige — borders */
+      --color-soft:      #F2EDE6;   /* warm off-white — hover/input bg */
+      --color-accent:    #B8844A;   /* caramel — CTAs, selections, progress */
+      --color-accent-bg: #F5E9D6;   /* caramel tint — soft selected state */
+      --color-accent-dk: #9A6B35;   /* darker caramel — hover state */
+      --radius-md:       14px;
+      --radius-lg:       20px;
+      --shadow-card:     0 1px 3px rgba(28,24,20,0.06), 0 8px 24px rgba(28,24,20,0.06);
+      --shadow-widget:   0 1px 2px rgba(28,24,20,0.05);
+      --font:            'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-display:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition:      0.15s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--color-page);
+      color: var(--color-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top nav ─────────────────────────────────────────────────────────── */
+    #site-header {
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 32px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    /* Mobile progress bar pinned under header */
+    #mobile-progress {
+      display: none;
+      height: 3px;
+      background: var(--color-border);
+      position: sticky;
+      top: 54px;
+      z-index: 9;
+      flex-shrink: 0;
+    }
+    #mobile-progress-fill {
+      height: 100%;
+      background: var(--color-accent);
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .logo {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-right {
+      font-size: 13px;
+      color: var(--color-muted);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Page layout ─────────────────────────────────────────────────────── */
+    #page {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 16px 0;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Chat card ───────────────────────────────────────────────────────── */
+    #chat-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: none;
+      overflow: hidden;
+      height: calc(100vh - 54px - 32px - 24px);
+      max-height: 820px;
+    }
+
+    #chat-intro {
+      padding: 24px 28px 0;
+      flex-shrink: 0;
+    }
+
+    #chat-intro h2 {
+      font-family: var(--font);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    #chat-intro p {
+      font-size: 13px;
+      color: var(--color-muted);
+      line-height: 1.5;
+    }
+
+    #divider { height: 1px; background: var(--color-border); margin: 18px 0 0; }
+
+    /* ── Messages ────────────────────────────────────────────────────────── */
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-track { background: transparent; }
+    #messages::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
+
+    .msg { display: flex; flex-direction: column; }
+    .msg.ai   { align-items: flex-start; }
+    .msg.user { align-items: flex-end; }
+
+    /* Fade-in for new chat entries */
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg { animation: msgIn 0.2s ease both; }
+
+    .bubble {
+      max-width: 72%;
+      padding: 11px 15px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+    }
+
+    .bubble.ai {
+      background: #EDEAE4;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      border-bottom-left-radius: 4px;
+      color: var(--color-text);
+    }
+
+    .bubble.user {
+      background: #2C2118;
+      color: #FAF7F3;
+      border-radius: var(--radius-md);
+      border-bottom-right-radius: 4px;
+    }
+
+    /* ── Typing indicator ────────────────────────────────────────────────── */
+    .typing-wrap {
+      display: flex;
+      gap: 5px;
+      padding: 12px 16px;
+      background: #EDEAE4;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      width: fit-content;
+    }
+
+    .typing-wrap span {
+      width: 5px; height: 5px;
+      background: #aaa; border-radius: 50%;
+      animation: bounce 1.3s ease-in-out infinite;
+    }
+    .typing-wrap span:nth-child(2) { animation-delay: 0.18s; }
+    .typing-wrap span:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── Widget containers ───────────────────────────────────────────────── */
+    .widget-wrap { align-self: flex-start; max-width: 96%; }
+
+    .widget-label {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 12px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── Chip widget ─────────────────────────────────────────────────────── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-family: var(--font);
+      cursor: pointer;
+      background: var(--color-bg);
+      color: var(--color-text);
+      transition: all var(--transition);
+      user-select: none;
+      letter-spacing: -0.01em;
+      box-shadow: var(--shadow-widget);
+    }
+
+    .chip:hover { border-color: var(--color-accent); background: var(--color-accent-bg); color: var(--color-accent-dk); }
+    .chip.selected { background: var(--color-accent); color: #fff; border-color: var(--color-accent); box-shadow: none; }
+
+    /* ── Garment image grid ──────────────────────────────────────────────── */
+    .garment-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+      max-width: 520px;
+    }
+
+    .garment-card {
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--color-bg);
+      position: relative;
+    }
+
+    .garment-card:hover { border-color: #aaa; }
+    .garment-card.selected { border-color: #dc2626; }
+
+    .garment-card.selected::after {
+      content: '✕';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(220,38,38,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #dc2626;
+      pointer-events: none;
+    }
+
+    .garment-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: var(--color-soft);
+      display: block;
+    }
+
+    .garment-name {
+      font-size: 10px;
+      font-weight: 500;
+      text-align: center;
+      padding: 5px 4px;
+      color: var(--color-text);
+      line-height: 1.2;
+    }
+
+    /* ── Image selector ──────────────────────────────────────────────────── */
+    .round-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 8px;
+    }
+
+    .outfit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .outfit-card {
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--color-bg);
+      position: relative;
+    }
+
+    .outfit-card:hover { border-color: #aaa; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .outfit-card.selected { border-color: var(--color-accent); border-width: 2.5px; }
+
+    .outfit-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 22px; height: 22px;
+      background: var(--color-accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .outfit-photo {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      background: var(--color-soft);
+    }
+
+    /* fallback gradient if img fails */
+    .outfit-photo-fallback {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .outfit-info { padding: 9px 11px; border-top: 1px solid var(--color-border); }
+    .outfit-style { font-size: 12.5px; font-weight: 600; color: var(--color-text); letter-spacing: -0.01em; }
+    .outfit-desc  { display: none; } /* desc mirrors style name — hidden to avoid redundancy */
+
+    .multi-hint {
+      font-size: 11px;
+      color: var(--color-muted);
+      margin-bottom: 8px;
+    }
+
+    .skip-btn {
+      font-size: 12px;
+      color: var(--color-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--font);
+      padding: 0;
+      margin-bottom: 8px;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: block;
+    }
+
+    .skip-btn:hover { color: var(--color-text); }
+
+    /* ── Tip text ────────────────────────────────────────────────────────── */
+    .widget-tip {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      line-height: 1.45;
+    }
+    .widget-tip-icon { flex-shrink: 0; opacity: 0.6; font-size: 13px; }
+
+    /* ── Handoff banner ──────────────────────────────────────────────────── */
+    .handoff-banner {
+      background: #fff8f0;
+      border: 1.5px solid #f59e0b;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      align-self: flex-start;
+      max-width: 80%;
+    }
+    .handoff-banner p { margin-bottom: 10px; color: var(--color-text); }
+    .handoff-cta {
+      display: inline-block;
+      padding: 9px 18px;
+      background: #f59e0b;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: var(--font);
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .handoff-cta:hover { opacity: 0.85; }
+
+    /* ── Date picker ─────────────────────────────────────────────────────── */
+    .dob-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: flex-end;
+    }
+    .dob-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .dob-field-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-muted);
+    }
+    .dob-input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: var(--font);
+      color: var(--color-text);
+      background: var(--color-bg);
+      outline: none;
+      transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+    .dob-input::-webkit-outer-spin-button,
+    .dob-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .dob-input:focus { border-color: var(--color-text); }
+    .dob-input.month { width: 72px; }
+    .dob-input.day   { width: 72px; }
+    .dob-input.year  { width: 96px; }
+    /* reuse date-input class for pant size custom input */
+    .date-input {
+      padding: 7px 10px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: var(--color-text);
+      background: var(--color-bg);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .date-input:focus { border-color: var(--color-text); }
+
+    /* ── Photo upload ────────────────────────────────────────────────────── */
+    .upload-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .upload-box {
+      width: 120px; height: 120px;
+      border: 2px dashed var(--color-border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      gap: 6px;
+      transition: border-color 0.15s;
+      overflow: hidden;
+      position: relative;
+      background: var(--color-soft);
+    }
+    .upload-box:hover { border-color: #aaa; }
+    .upload-box.has-image { border-style: solid; border-color: var(--color-border); }
+    .upload-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .upload-box-icon { font-size: 22px; color: var(--color-muted); line-height: 1; }
+    .upload-box-label { font-size: 11px; color: var(--color-muted); font-weight: 500; }
+    .upload-remove {
+      position: absolute; top: 4px; right: 4px;
+      width: 18px; height: 18px;
+      background: rgba(0,0,0,0.5); color: #fff;
+      border-radius: 50%; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-weight: 700;
+    }
+    .upload-desc {
+      font-size: 12px;
+      color: var(--color-muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .upload-desc li { margin-left: 14px; }
+
+    /* ── Social handles ──────────────────────────────────────────────────── */
+    .social-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .social-input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--color-text);
+      background: var(--color-bg);
+      outline: none;
+      transition: border-color 0.15s;
+      width: 280px;
+    }
+    .social-input:focus { border-color: var(--color-text); }
+    .social-input::placeholder { color: #c0c0c0; }
+
+    /* ── Height picker ───────────────────────────────────────────────────── */
+    .height-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 7px;
+      margin-top: 12px;
+    }
+    .height-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .height-btn {
+      padding: 7px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font);
+      cursor: pointer;
+      background: var(--color-bg);
+      color: var(--color-text);
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .height-btn:hover { border-color: #aaa; }
+    .height-btn.selected { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+
+    /* ── Color picker ────────────────────────────────────────────────────── */
+    .color-hint {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-bottom: 10px;
+      display: flex;
+      gap: 14px;
+    }
+
+    .color-hint span { display: flex; align-items: center; gap: 5px; }
+    .hint-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .hint-dot.prefer { background: #16a34a; }
+    .hint-dot.avoid  { background: #dc2626; }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 4px 2px;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+
+    .color-swatch:hover { background: var(--color-soft); }
+
+    .swatch-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-border);
+      transition: all 0.15s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .swatch-dot.prefer { border: 2.5px solid #16a34a; box-shadow: 0 0 0 2px #bbf7d0; }
+    .swatch-dot.avoid  { border: 2.5px solid #dc2626; box-shadow: 0 0 0 2px #fecaca; }
+
+    .swatch-name {
+      font-size: 8.5px;
+      color: var(--color-muted);
+      text-align: center;
+      line-height: 1.2;
+      max-width: 38px;
+    }
+
+    /* ── Prints picker ───────────────────────────────────────────────────── */
+    .prints-hint {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-bottom: 12px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .prints-hint span { display: flex; align-items: center; gap: 5px; }
+
+    .prints-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+      max-width: 480px;
+    }
+
+    .print-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px 4px;
+      border-radius: 10px;
+      border: 1.5px solid var(--color-border);
+      background: var(--color-bg);
+      transition: all 0.15s;
+    }
+
+    .print-item:hover { border-color: #aaa; }
+    .print-item.prefer { border-color: #16a34a; background: #f0fdf4; }
+    .print-item.avoid  { border-color: #dc2626; background: #fff5f5; }
+
+    .print-swatch {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+
+    .print-label {
+      font-size: 10px;
+      color: var(--color-muted);
+      text-align: center;
+      line-height: 1.2;
+      font-weight: 500;
+    }
+
+    .print-item.prefer .print-label { color: #16a34a; }
+    .print-item.avoid  .print-label { color: #dc2626; }
+
+    /* ── Confirm button ──────────────────────────────────────────────────── */
+    .confirm-btn {
+      padding: 11px 22px;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .confirm-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+    .confirm-btn:active:not(:disabled) { transform: translateY(0); }
+    .confirm-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+
+    /* ── Input area ──────────────────────────────────────────────────────── */
+    #input-row {
+      padding: 14px 20px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      background: var(--color-bg);
+      align-items: center;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 16px; /* 16px prevents iOS Safari from zooming on focus */
+      font-family: var(--font);
+      color: var(--color-text);
+      outline: none;
+      background: var(--color-soft);
+      transition: border-color var(--transition), background var(--transition);
+      min-height: 44px;
+    }
+
+    #user-input:focus { border-color: var(--color-accent); background: #fff; }
+    #user-input::placeholder { color: #c0c0c0; }
+    #user-input:disabled { background: var(--color-soft); color: #ccc; }
+
+    #send-btn {
+      padding: 10px 18px;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: opacity var(--transition);
+      white-space: nowrap;
+      min-height: 44px;
+    }
+
+    #send-btn:hover:not(:disabled) { opacity: 0.84; }
+    #send-btn:disabled { opacity: 0.22; cursor: not-allowed; }
+
+    /* ── Profile side panel ──────────────────────────────────────────────── */
+    #profile-panel { width: 248px; flex-shrink: 0; }
+
+    .profile-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .profile-card-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .profile-card-header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text);
+    }
+
+    .progress-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 3px;
+      background: var(--color-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-pct {
+      font-size: 12px;
+      color: var(--color-muted);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    .profile-fields { padding: 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+    .profile-field { display: flex; flex-direction: column; gap: 2px; }
+
+    .field-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-muted);
+    }
+
+    .field-value {
+      font-size: 13px;
+      color: var(--color-text);
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .field-value.pending { color: #ccc; font-style: italic; }
+
+    /* ── Completion card ─────────────────────────────────────────────────── */
+    .completion-card {
+      background: linear-gradient(135deg, #2C2118 0%, #3D2F22 100%);
+      color: #FAF7F3;
+      border-radius: var(--radius-lg);
+      padding: 32px 28px 28px;
+      margin: 8px 0 24px;
+      text-align: center;
+      animation: msgIn 0.3s ease both;
+    }
+    .completion-check {
+      width: 56px;
+      height: 56px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .completion-check svg { display: block; }
+    .completion-headline {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .completion-sub {
+      font-size: 14px;
+      color: rgba(250,247,243,0.65);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .completion-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .completion-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(250,247,243,0.8);
+      line-height: 1.5;
+    }
+    .completion-step-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(184,132,74,0.25);
+      color: var(--color-accent);
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .completion-cta {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+      text-decoration: none;
+      text-align: center;
+    }
+    .completion-cta:hover { background: var(--color-accent-dk); transform: translateY(-1px); }
+    .completion-cta:active { transform: translateY(0); }
+    .input-locked {
+      padding: 14px 20px;
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-muted);
+      background: var(--color-bg);
+    }
+
+    /* ── Touch / tap targets ─────────────────────────────────────────────── */
+    .chip, .confirm-btn, .skip-btn, button {
+      touch-action: manipulation; /* prevent double-tap zoom */
+    }
+    .chip { min-height: 40px; display: inline-flex; align-items: center; }
+    .confirm-btn { min-height: 44px; }
+
+    /* ── Mobile ──────────────────────────────────────────────────────────── */
+    @media (max-width: 720px) {
+      #page { flex-direction: column; padding: 0; gap: 0; }
+      #profile-panel { display: none; }
+      #mobile-progress { display: block; }
+      #chat-card {
+        height: 100dvh;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+      #chat-intro { padding: 14px 16px 0; }
+      #messages { padding: 14px 16px; }
+      #input-row {
+        padding: 10px 12px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+      }
+      .bubble { max-width: 88%; font-size: 14px; }
+      .color-grid { grid-template-columns: repeat(5, 1fr); }
+      .garment-grid { grid-template-columns: repeat(3, 1fr); }
+      .prints-grid { grid-template-columns: repeat(3, 1fr); }
+      #site-header { padding: 0 16px; }
+      .widget-wrap { max-width: 100%; }
+      .chip { min-height: 44px; padding: 10px 16px; font-size: 14px; }
+      .confirm-btn { min-height: 48px; font-size: 15px; width: 100%; }
+      .skip-btn { min-height: 44px; }
+      .widget-label { font-size: 20px; }
+    }
+
+    @media (max-width: 400px) {
+      .garment-grid { grid-template-columns: repeat(2, 1fr); }
+      .color-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top nav -->
+<header id="site-header">
+  <a class="logo" href="#">
+    <img src="https://taelor.style/cdn/shop/files/Taelor_BY_large_0aff0069-9ae7-4763-83be-fd280dcecfc7.png?v=1694555057"
+         alt="Taelor" height="26" style="display:block;" />
+  </a>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span class="header-right">Style Profile</span>
+    <button id="start-over-btn" onclick="confirmStartOver()" style="display:none;font-size:12px;color:var(--color-muted);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline;text-underline-offset:2px;padding:0;">Start over</button>
+  </div>
+</header>
+<div id="mobile-progress"><div id="mobile-progress-fill"></div></div>
+
+<div id="page">
+
+  <!-- Chat card -->
+  <div id="chat-card">
+    <div id="chat-intro">
+      <h2>Meet your stylist</h2>
+      <p>A few questions to build your style profile. Takes about 5 minutes.</p>
+    </div>
+    <div id="divider"></div>
+
+    <div id="messages"></div>
+
+    <div id="input-row">
+      <input id="user-input" type="text" placeholder="Reply here..." autocomplete="off" />
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
+
+  <!-- Profile panel -->
+  <div id="profile-panel">
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <h3>Your Profile</h3>
+        <div class="progress-row">
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-pct" id="progress-pct">0%</div>
+        </div>
+      </div>
+      <div class="profile-fields" id="profile-fields">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- #page -->
+
+<script>
+  // ── Session ID — persist across page loads ───────────────────────────────
+  const STORAGE_KEY = 'taelor_quiz_session_id';
+  function makeSessionId() { return 'sess_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  let SESSION_ID = localStorage.getItem(STORAGE_KEY);
+  if (!SESSION_ID || !/^[a-z0-9_]{5,60}$/.test(SESSION_ID)) {
+    SESSION_ID = makeSessionId();
+    localStorage.setItem(STORAGE_KEY, SESSION_ID);
+  }
+
+  const messagesEl          = document.getElementById('messages');
+  const profileFields       = document.getElementById('profile-fields');
+  const progressFill        = document.getElementById('progress-fill');
+  const progressPct         = document.getElementById('progress-pct');
+  const mobileProgressFill  = document.getElementById('mobile-progress-fill');
+  const userInput           = document.getElementById('user-input');
+  const sendBtn             = document.getElementById('send-btn');
+
+  let isWaitingForWidget = false;
+
+  // ── Field label map ────────────────────────────────────────────────────
+  const FIELD_LABELS = {
+    phoneNumber:          'Phone',
+    heightFt:             'Height (ft)',
+    heightIn:             'Height (in)',
+    weightLbs:            'Weight (lbs)',
+    currentTopSize:       'Top Size',
+    currentTopSizeSecondary: 'Top Size (alt)',
+    topFit:               'Top Fit',
+    bottomBrand:          'Pants',
+    pantFit:              'Pant Fit',
+    shortLength:          'Shorts Length',
+    bodyShape:            'Body Shape',
+    fitProblems:          'Fit Issues',
+    favoriteBrands:       'Brands',
+    stylePreferenceGates: 'Other Prefs',
+    exploringNewStyles:   'Style Spectrum',
+    impression:           'Style Goals',
+    occasions:            'Occasions',
+    lookPreference:       'Outfit Vibe',
+    doNotWant:            'Exclude',
+    topColorPrefer:       'Top Colors ✓',
+    topColorDislike:      'Top Colors ✗',
+    pantColorPrefer:      'Pant Colors ✓',
+    pantColorDislike:     'Pant Colors ✗',
+    printPrefer:          'Prints ✓',
+    printAvoid:           'Prints ✗',
+    firstShipmentRequest: 'First Box Note',
+    otherAdvice:          'Stylist Note',
+    industry:             'Industry',
+    currentRole:          'Role',
+    motivation:           'Goals',
+    dob:                  'Date of Birth',
+    platforms:            'Platforms',
+    topics:               'Topics',
+    favoriteShows:        'Fav Shows',
+    socialMediaHandles:   'Social',
+    referralSource:       'How They Found Us',
+  };
+
+  const TOTAL_FIELDS = 36;
+
+  // ── Tip text for specific steps ────────────────────────────────────────
+  const FIELD_TIPS = {
+    'currentTopSize':              'When between sizes, go with the larger one — we can always adjust.',
+    'bottomBrand.primaryWaist':    'Check the inside of the waistband for a W number. Round up to the next whole number.',
+    'bottomBrand.primaryInseam':   'Check your inseam tag or measure from crotch to ankle.',
+    'heightFt':                    'Round to the nearest whole inch.',
+    'bodyShape':                   'Pick what feels closest — your stylist will refine this.',
+    'favoriteBrands':              'Select all that apply, even if you only bought from them once.',
+    'doNotWant':                   'Tap anything you\'d never want us to send. Leave blank if you\'re open to everything.',
+    'pant_size':                   'Check the inside of the waistband for a label like "W32/L30". Round up to the next whole number.',
+  };
+
+  // ── Dynamic input placeholders ─────────────────────────────────────────
+  const PLACEHOLDER_RULES = [
+    { keywords: ['phone', 'number', 'reach you', 'text'],          hint: 'e.g. (415) 555-1234' },
+    { keywords: ['date of birth', 'birthday', 'born'],             hint: 'e.g. 08/06/2004' },
+    { keywords: ['work', 'role', 'job title', 'do for work'],      hint: 'e.g. Software Engineer, Sales Manager, Teacher' },
+    { keywords: ['brands', 'brand'],                               hint: 'e.g. Uniqlo, Lululemon, J.Crew' },
+    { keywords: ['shows', 'blogs', 'podcasts', 'favorite'],        hint: 'e.g. Succession, How I Built This, GQ Style' },
+    { keywords: ['handle', 'social media', 'instagram', 'url'],    hint: 'e.g. @username or instagram.com/username' },
+    { keywords: ['first shipment', 'special request'],             hint: 'e.g. More blazers, nothing too casual' },
+    { keywords: ['other advice', 'stylist know', 'wardrobe', 'missing'], hint: 'e.g. What impact you want to achieve, or what\'s missing from your wardrobe' },
+  ];
+
+  function updateInputPlaceholder(aiText) {
+    if (!aiText) return;
+    const lower = aiText.toLowerCase();
+    for (const rule of PLACEHOLDER_RULES) {
+      if (rule.keywords.some(k => lower.includes(k))) {
+        userInput.placeholder = rule.hint;
+        return;
+      }
+    }
+    userInput.placeholder = 'Reply here…';
+  }
+
+  function addTip(wrap, tipKey) {
+    const tip = FIELD_TIPS[tipKey];
+    if (!tip) return;
+    const el = document.createElement('div');
+    el.className = 'widget-tip';
+    el.innerHTML = `<span class="widget-tip-icon">ⓘ</span><span>${tip}</span>`;
+    wrap.appendChild(el);
+  }
+
+  // ── Colors ─────────────────────────────────────────────────────────────
+  const COLORS = [
+    { name: 'Open to all',  bg: 'conic-gradient(#f6d365,#fda085,#96c93d,#5f72be,#f6d365)', border: true },
+    { name: 'Pink',         hex: '#F48FB1' },
+    { name: 'Red',          hex: '#EF5350' },
+    { name: 'Dark Red',     hex: '#B71C1C' },
+    { name: 'Light Orange', hex: '#FFCC80' },
+    { name: 'Orange',       hex: '#FFA726' },
+    { name: 'Burnt Orange', hex: '#E65100' },
+    { name: 'Light Green',  hex: '#A5D6A7' },
+    { name: 'Green',        hex: '#4CAF50' },
+    { name: 'Dark Green',   hex: '#1B5E20' },
+    { name: 'Light Yellow', hex: '#FFF9C4', border: true },
+    { name: 'Yellow',       hex: '#FFEB3B', border: true },
+    { name: 'Mustard',      hex: '#F9A825' },
+    { name: 'Light Blue',   hex: '#81D4FA' },
+    { name: 'Blue',         hex: '#1E88E5' },
+    { name: 'Dark Blue',    hex: '#0D47A1' },
+    { name: 'Light Purple', hex: '#CE93D8' },
+    { name: 'Purple',       hex: '#8E24AA' },
+    { name: 'Dark Purple',  hex: '#4A148C' },
+    { name: 'Khaki',        hex: '#C8B560' },
+    { name: 'Tan',          hex: '#D2B48C' },
+    { name: 'Brown',        hex: '#795548' },
+    { name: 'Light Gray',   hex: '#BDBDBD' },
+    { name: 'Gray',         hex: '#757575' },
+    { name: 'Black',        hex: '#212121' },
+    { name: 'White',        hex: '#F5F5F5', border: true },
+    { name: 'Cream',        hex: '#FFF8E1', border: true },
+    { name: 'Neon',         hex: '#CCFF00', border: true },
+  ];
+
+  // ── Prints ─────────────────────────────────────────────────────────────
+  // Each print has a CSS background for the circular swatch
+  const PRINTS = [
+    {
+      name: 'Vertical Stripes',
+      bg: 'repeating-linear-gradient(90deg, #222 0px, #222 3px, #f5f5f5 3px, #f5f5f5 14px)'
+    },
+    {
+      name: 'Pinstripes',
+      bg: 'repeating-linear-gradient(160deg, #555 0px, #555 1px, #f0f0f0 1px, #f0f0f0 8px)'
+    },
+    {
+      name: 'Horizontal Stripes',
+      bg: 'repeating-linear-gradient(0deg, #222 0px, #222 3px, #f5f5f5 3px, #f5f5f5 14px)'
+    },
+    {
+      name: 'Polka Dot',
+      bg: 'radial-gradient(circle, #333 20%, transparent 20%) 0 0 / 12px 12px, radial-gradient(circle, #333 20%, transparent 20%) 6px 6px / 12px 12px, #f5f5f5'
+    },
+    {
+      name: 'Plaid',
+      bg: 'repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(30,80,170,0.35) 8px, rgba(30,80,170,0.35) 10px), repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(30,80,170,0.35) 8px, rgba(30,80,170,0.35) 10px), repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(200,40,40,0.3) 18px, rgba(200,40,40,0.3) 20px), repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(200,40,40,0.3) 18px, rgba(200,40,40,0.3) 20px), #d9c98a'
+    },
+    {
+      name: 'Gingham',
+      bg: 'repeating-linear-gradient(0deg, transparent, transparent 9px, rgba(30,80,160,0.25) 9px, rgba(30,80,160,0.25) 10px), repeating-linear-gradient(90deg, transparent, transparent 9px, rgba(30,80,160,0.25) 9px, rgba(30,80,160,0.25) 10px), #dde8f5'
+    },
+    {
+      name: 'Houndstooth',
+      bg: 'conic-gradient(#222 90deg, #f0f0f0 90deg 180deg, #222 180deg 270deg, #f0f0f0 270deg) 0 0 / 12px 12px'
+    },
+    {
+      name: 'Argyle',
+      bg: 'repeating-linear-gradient(45deg, #1a3a6e 0, #1a3a6e 2px, transparent 0, transparent 50%), repeating-linear-gradient(-45deg, #1a3a6e 0, #1a3a6e 2px, transparent 0, transparent 50%), #d4c8a8'
+    },
+    {
+      name: 'Geometric',
+      bg: 'repeating-linear-gradient(60deg, transparent, transparent 10px, #666 10px, #666 12px), repeating-linear-gradient(-60deg, transparent, transparent 10px, #666 10px, #666 12px), #e8e8e8'
+    },
+    {
+      name: 'Camo',
+      bg: 'radial-gradient(ellipse 24px 18px at 20% 25%, #4a5e2a 100%, transparent), radial-gradient(ellipse 18px 14px at 70% 60%, #6b7c3a 100%, transparent), radial-gradient(ellipse 20px 16px at 45% 80%, #3d4e1e 100%, transparent), #8a9a58'
+    },
+    {
+      name: 'Statement Floral',
+      bg: 'radial-gradient(ellipse 14px 18px at 50% 50%, #c0392b 100%, transparent), radial-gradient(ellipse 8px 10px at 20% 20%, #e74c3c 100%, transparent), radial-gradient(ellipse 8px 10px at 80% 80%, #e74c3c 100%, transparent), radial-gradient(circle 4px at 50% 50%, #f8c471 100%, transparent), #2d5a1b'
+    },
+    {
+      name: 'Micro Floral',
+      bg: 'radial-gradient(circle 3px at 25% 25%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 75% 25%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 50% 65%, #9c27b0 100%, transparent), radial-gradient(circle 3px at 25% 75%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 75% 75%, #9c27b0 100%, transparent), #fff5fb'
+    },
+    {
+      name: 'Tropical',
+      bg: 'radial-gradient(ellipse 20px 26px at 30% 40%, #1b8a4e 100%, transparent), radial-gradient(ellipse 16px 20px at 70% 60%, #27ae60 100%, transparent), radial-gradient(circle 6px at 50% 20%, #f39c12 100%, transparent), #87ceeb'
+    },
+    {
+      name: 'Abstract',
+      bg: 'radial-gradient(ellipse 20px 15px at 30% 35%, #3498db 80%, transparent), radial-gradient(ellipse 15px 20px at 70% 65%, #e74c3c 80%, transparent), radial-gradient(circle 12px at 55% 30%, #f1c40f 80%, transparent), #f8f8f8'
+    },
+    {
+      name: 'Animal',
+      bg: 'repeating-linear-gradient(40deg, #333 0, #333 4px, #b8860b 4px, #b8860b 12px, #333 12px, #333 16px, #b8860b 16px, #b8860b 22px)'
+    },
+    {
+      name: 'Paisley',
+      bg: 'radial-gradient(ellipse 16px 22px at 50% 45%, #8b0000 80%, transparent), radial-gradient(circle 5px at 50% 20%, #d4a017 100%, transparent), radial-gradient(ellipse 8px 12px at 65% 58%, #1a3a6e 70%, transparent), #c8a870'
+    },
+    {
+      name: 'Graphic',
+      bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
+    },
+    {
+      name: 'Logo',
+      bg: '#1a1a2e',
+      text: 'K',
+      textColor: '#fff'
+    },
+    {
+      name: 'Solid Only',
+      bg: '#ffffff',
+      border: true,
+      text: '○',
+      textColor: '#ccc'
+    },
+  ];
+
+  // ── Garment images ─────────────────────────────────────────────────────
+  // Replace with Taelor CDN URLs for production
+  const GARMENT_IMAGES = {
+    'Shorts':                 'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=200&h=200&fit=crop&auto=format',
+    'Pants':                  'https://images.unsplash.com/photo-1624378440560-20840aed71bc?w=200&h=200&fit=crop&auto=format',
+    'Blazers':                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format',
+    'Cardigan':               'https://images.unsplash.com/photo-1551537258-edf41e926082?w=200&h=200&fit=crop&auto=format',
+    'Sweater':                'https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=200&h=200&fit=crop&auto=format',
+    'Long Sleeve Button Up':  'https://images.unsplash.com/photo-1587152332734-e7cb4e1d1a99?w=200&h=200&fit=crop&auto=format',
+    'Short Sleeve Button Up': 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=200&h=200&fit=crop&auto=format',
+    'Business Button Up':     'https://images.unsplash.com/photo-1541417557177-8fb47cb24424?w=200&h=200&fit=crop&auto=format',
+    'Henleys':                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=200&h=200&fit=crop&auto=format',
+    'Jackets':                'https://images.unsplash.com/photo-1624378440560-20840aed71bc?w=200&h=200&fit=crop&auto=format',
+    'Polos':                  'https://images.unsplash.com/photo-1473966604640-70b2d4a27eb4?w=200&h=200&fit=crop&auto=format',
+    'Shacket':                'https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?w=200&h=200&fit=crop&auto=format',
+    'Sweatshirts':            'https://images.unsplash.com/photo-1548372290-8d01b6c8e78c?w=200&h=200&fit=crop&auto=format',
+    'T-Shirts':               'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=200&h=200&fit=crop&auto=format',
+    'Vest':                   'https://images.unsplash.com/photo-1535268244-70f0b00e7d4a?w=200&h=200&fit=crop&auto=format',
+    'Coat':                   'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop&auto=format',
+    'Hoodie':                 'https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=200&h=200&fit=crop&auto=format',
+    'Activewear':             'https://images.unsplash.com/photo-1517438476312-10d79c077509?w=200&h=200&fit=crop&auto=format',
+  };
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+
+  function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  function addMessage(text, role) {
+    if (!text) return;
+    const wrap = document.createElement('div');
+    wrap.className = `msg ${role}`;
+    const b = document.createElement('div');
+    b.className = `bubble ${role}`;
+    b.textContent = text;
+    wrap.appendChild(b);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function addTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ai';
+    wrap.id = 'typing';
+    const t = document.createElement('div');
+    t.className = 'typing-wrap';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    wrap.appendChild(t);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function removeTyping() { document.getElementById('typing')?.remove(); }
+
+  function setInputDisabled(on) {
+    userInput.disabled = on;
+    sendBtn.disabled = on;
+  }
+
+  function formatValue(key, val) {
+    if (val === null || val === undefined) return null;
+    if (val === '__skipped__') return null;  // hide skipped fields from profile panel
+    if (key === 'bottomBrand' && typeof val === 'object') {
+      const parts = [];
+      if (val.primaryWaist) parts.push(`W${val.primaryWaist}`);
+      if (val.primaryInseam) parts.push(`L${val.primaryInseam}`);
+      return parts.join(' / ') || null;
+    }
+    if (key === 'exploringNewStyles' && typeof val === 'object') {
+      const s = val.currentStyleSpectrum;
+      return s ? `Style: ${s}/5` : null;
+    }
+    if (key === 'lookPreference' && typeof val === 'object') {
+      const count = Object.keys(val).length;
+      return count ? `${count}/8 rounds done` : null;
+    }
+    if (Array.isArray(val)) return val.length ? val.join(', ') : null;
+    return String(val);
+  }
+
+  function updateProfile(wrapper) {
+    const profile = wrapper?.stylingQuizJSON || wrapper || {};
+    profileFields.innerHTML = '';
+
+    let count = 0;
+    function countLeaves(obj) {
+      for (const v of Object.values(obj)) {
+        if (v !== null && typeof v === 'object' && !Array.isArray(v)) countLeaves(v);
+        else if (v !== null && v !== undefined && v !== '__skipped__') count++;
+      }
+    }
+    countLeaves(profile);
+
+    const pct = Math.min(100, Math.round((count / TOTAL_FIELDS) * 100));
+    progressFill.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+    mobileProgressFill.style.width = pct + '%';
+
+    for (const [key, val] of Object.entries(profile)) {
+      if (key === 'isComplete') continue;
+      const label = FIELD_LABELS[key] || key;
+      const display = formatValue(key, val);
+      if (!display) continue;
+
+      const row = document.createElement('div');
+      row.className = 'profile-field';
+      const displayTrunc = display.length > 60 ? display.slice(0, 60) + '…' : display;
+      row.innerHTML = `<span class="field-label">${label}</span><span class="field-value">${displayTrunc}</span>`;
+      profileFields.appendChild(row);
+    }
+
+    if (profileFields.children.length === 0) {
+      profileFields.innerHTML = '<span class="field-value pending">Questions will appear here</span>';
+    }
+  }
+
+  // ── Widget dispatch ──────────────────────────────────────────────────────
+
+  function renderWidget(widget) {
+    isWaitingForWidget = true;
+    setInputDisabled(true);
+    if (widget.widgetType === 'images')        return renderImageSelector(widget);
+    if (widget.widgetType === 'colors')        return renderColorPicker(widget);
+    if (widget.widgetType === 'prints')        return renderPrintsPicker(widget);
+    if (widget.widgetType === 'date')          return renderDatePicker(widget);
+    if (widget.widgetType === 'height')        return renderHeightPicker(widget);
+    if (widget.widgetType === 'pant_size')     return renderPantSizePicker(widget);
+    if (widget.widgetType === 'photo_upload')  return renderPhotoUpload(widget);
+    if (widget.widgetType === 'social_handles')return renderSocialHandles(widget);
+    if (widget.widgetType === 'brand_search')  return renderBrandSearch(widget);
+    if (widget.widgetType === 'fit_cards')     return renderFitCards(widget);
+    if (widget.widgetType === 'top_sizing')    return renderTopSizing(widget);
+    if (widget.widgetType === 'bottom_sizing') return renderBottomSizing(widget);
+    // Garment step: chips field is 'doNotWant' — render with images
+    if (widget.widgetType === 'chips' && widget.field === 'doNotWant') return renderGarmentGrid(widget);
+    if (widget.widgetType === 'chips') return renderChips(widget);
+    // Safety: unknown widget type — don't leave input locked
+    console.warn('[widget] Unknown widgetType:', widget.widgetType, '— falling back to free-text');
+    isWaitingForWidget = false;
+    setInputDisabled(false);
+  }
+
+  // ── Chips ────────────────────────────────────────────────────────────────
+  function renderChips(widget) {
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    if (widget.is_required) {
+      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;">*</span>`;
+    } else {
+      lbl.textContent = widget.question;
+    }
+    wrap.appendChild(lbl);
+    addTip(wrap, widget.field);
+
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    let selected = new Set();
+
+    // Validation error element
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-top:6px;display:none;';
+    errEl.textContent = 'Please select an option to continue.';
+
+    widget.options.forEach(opt => {
+      const c = document.createElement('div');
+      c.className = 'chip';
+      c.textContent = opt;
+      c.addEventListener('click', () => {
+        if (widget.select_type === 'single') {
+          chips.querySelectorAll('.chip').forEach(x => x.classList.remove('selected'));
+          c.classList.add('selected');
+          selected = new Set([opt]);
+          chips.style.outline = '';
+          errEl.style.display = 'none';
+          btn.disabled = false;
+          btn.click();
+        } else {
+          c.classList.toggle('selected');
+          selected[c.classList.contains('selected') ? 'add' : 'delete'](opt);
+          const hasSelection = selected.size > 0 || (otherInput && otherInput.value.trim());
+          btn.disabled = false; // multi always enabled for "confirm"
+          if (hasSelection) { chips.style.outline = ''; errEl.style.display = 'none'; }
+        }
+      });
+      chips.appendChild(c);
+    });
+    wrap.appendChild(chips);
+    wrap.appendChild(errEl);
+
+    // "Other" free text input
+    let otherInput = null;
+    if (widget.other_placeholder) {
+      const otherWrap = document.createElement('div');
+      otherWrap.style.cssText = 'margin-top:10px;';
+      const otherLbl = document.createElement('div');
+      otherLbl.style.cssText = 'font-size:12px;color:#888;margin-bottom:4px;';
+      otherLbl.textContent = widget.other_placeholder;
+      otherInput = document.createElement('textarea');
+      otherInput.style.cssText = 'width:100%;box-sizing:border-box;padding:8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical;min-height:60px;font-family:inherit;';
+      otherInput.placeholder = 'Type here…';
+      otherWrap.appendChild(otherLbl);
+      otherWrap.appendChild(otherInput);
+      wrap.appendChild(otherWrap);
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm selection';
+    if (widget.select_type === 'multi') btn.disabled = false;
+    else btn.disabled = true;
+
+    btn.addEventListener('click', async () => {
+      const otherText = otherInput ? otherInput.value.trim() : '';
+      const hasSelection = selected.size > 0 || otherText;
+
+      if (widget.is_required && !hasSelection) {
+        chips.style.outline = '2px solid #e53e3e';
+        chips.style.borderRadius = '8px';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      let value;
+      if (widget.select_type === 'single') {
+        value = [...selected][0] || otherText;
+      } else {
+        value = [...selected];
+        if (otherText) value.push(otherText);
+        if (value.length === 0) value = [];
+      }
+
+      const displayText = Array.isArray(value)
+        ? (value.length ? value.join(', ') : 'Skipped')
+        : (value || 'Skipped');
+
+      wrap.closest('.msg')?.remove() || wrap.remove();
+      addMessage(displayText, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value, tool_use_id: widget.tool_use_id });
+    });
+
+    if (widget.select_type === 'multi') wrap.appendChild(btn);
+
+    const msgWrap = document.createElement('div');
+    msgWrap.className = 'msg ai';
+    msgWrap.appendChild(wrap);
+    messagesEl.appendChild(msgWrap);
+    scrollBottom();
+  }
+
+  // ── Fit Cards (top fit / pant fit with descriptions) ─────────────────────
+  function renderFitCards(widget) {
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    if (widget.is_required) {
+      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;">*</span>`;
+    } else {
+      lbl.textContent = widget.question;
+    }
+    wrap.appendChild(lbl);
+
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-bottom:8px;display:none;';
+    errEl.textContent = 'Please select an option to continue.';
+    wrap.appendChild(errEl);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px;';
+
+    let selectedOpt = null;
+
+    widget.options.forEach((opt, i) => {
+      const desc = widget.descriptions?.[i] || '';
+      const card = document.createElement('div');
+      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
+      card.innerHTML = `
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;">${opt}</div>
+        <div style="font-size:11px;color:#888;line-height:1.4;">${desc}</div>
+      `;
+      card.addEventListener('click', () => {
+        grid.querySelectorAll('div[data-fit-card]').forEach(c => {
+          c.style.borderColor = '#e2e8f0';
+          c.style.background = '#fff';
+          c.style.color = '';
+        });
+        card.style.borderColor = '#B8844A';
+        card.style.background = '#B8844A';
+        card.style.color = '#fff';
+        card.querySelector('div:last-child').style.color = '#aaa';
+        selectedOpt = opt;
+        errEl.style.display = 'none';
+        // Auto-confirm on single select
+        setTimeout(() => confirmBtn.click(), 120);
+      });
+      card.dataset.fitCard = '1';
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm';
+    confirmBtn.style.display = 'none'; // hidden; auto-clicks on selection
+    confirmBtn.addEventListener('click', async () => {
+      if (widget.is_required && !selectedOpt) {
+        errEl.style.display = 'block';
+        return;
+      }
+      wrap.closest('.msg')?.remove() || wrap.remove();
+      addMessage(selectedOpt || 'Skipped', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: selectedOpt, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(confirmBtn);
+
+    const msgWrap = document.createElement('div');
+    msgWrap.className = 'msg ai';
+    msgWrap.appendChild(wrap);
+    messagesEl.appendChild(msgWrap);
+    scrollBottom();
+  }
+
+  // ── Sizing Wizard (top size + top fit + pant size + pant fit) ─────────────
+  // ── Shared sizing helpers ─────────────────────────────────────────────────
+  function makeSizingSection(wrap, title) {
+    const h = document.createElement('div');
+    h.style.cssText = 'font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:#888;margin:16px 0 4px;';
+    h.textContent = title;
+    wrap.appendChild(h);
+  }
+  function makeSizingTip(wrap, text) {
+    const t = document.createElement('div');
+    t.style.cssText = 'font-size:11px;color:#aaa;margin-bottom:8px;line-height:1.4;display:flex;align-items:flex-start;gap:4px;';
+    t.innerHTML = `<span style="flex-shrink:0;margin-top:1px;">ⓘ</span><span>${text}</span>`;
+    wrap.appendChild(t);
+  }
+  function makePillRow(wrap, options, onSelect, isCard = false, descs = [], errEl = null) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;';
+    let active = null;
+    options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      if (isCard) {
+        btn.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:10px 12px;text-align:center;cursor:pointer;background:#fff;min-width:80px;flex:1;touch-action:manipulation;';
+        btn.innerHTML = `<div style="font-size:13px;font-weight:600;">${opt}</div><div style="font-size:10px;color:#999;margin-top:3px;line-height:1.3;">${descs[i] || ''}</div>`;
+      } else {
+        btn.style.cssText = 'padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:100px;font-size:13px;cursor:pointer;background:#fff;white-space:nowrap;touch-action:manipulation;min-height:40px;';
+        btn.textContent = opt;
+      }
+      btn.addEventListener('click', () => {
+        if (active) {
+          active.style.borderColor = '#e2e8f0';
+          active.style.background = '#fff';
+          if (isCard) active.querySelector('div').style.color = '';
+        }
+        btn.style.borderColor = '#B8844A';
+        btn.style.background = '#B8844A';
+        btn.style.color = '#fff';
+        if (isCard) btn.querySelectorAll('div').forEach(d => d.style.color = '#fff');
+        active = btn;
+        onSelect(opt);
+        if (errEl) errEl.style.display = 'none';
+      });
+      row.appendChild(btn);
+    });
+    wrap.appendChild(row);
+  }
+
+  // ── Top sizing widget ─────────────────────────────────────────────────────
+  function renderTopSizing(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+    wrap.style.maxWidth = '100%';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question || "Let's start with tops.";
+    wrap.appendChild(lbl);
+
+    let topSize = null, topFit = null;
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-bottom:8px;display:none;';
+
+    makeSizingSection(wrap, 'Top Size *');
+    makePillRow(wrap, ['XS','S','M','L','XL','XXL','In between'], v => { topSize = v; }, false, [], errEl);
+
+    makeSizingSection(wrap, 'Top Fit *');
+    makePillRow(wrap, ['Slim','Regular','Relaxed'], v => { topFit = v; }, true,
+      ['Close to body','Classic cut','Loose & roomy'], errEl);
+
+    wrap.appendChild(errEl);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm top sizing';
+    confirmBtn.style.marginTop = '14px';
+    confirmBtn.addEventListener('click', async () => {
+      if (!topSize || !topFit) {
+        errEl.textContent = 'Please select both a size and a fit.';
+        errEl.style.display = 'block';
+        return;
+      }
+      const display = `Tops: ${topSize} · ${topFit} fit`;
+      outer.remove();
+      addMessage(display, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { currentTopSize: topSize, topFit },
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(confirmBtn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Bottom sizing widget ──────────────────────────────────────────────────
+  function renderBottomSizing(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+    wrap.style.maxWidth = '100%';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question || "Now for pants.";
+    wrap.appendChild(lbl);
+
+    let waist = null, inseam = null, pantFit = null;
+    let activeW = null, activeL = null;
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-bottom:8px;display:none;';
+
+    makeSizingSection(wrap, 'Pant Waist (W) *');
+    makeSizingTip(wrap, 'Check the inside of your waistband for a tag like "W32 L30". Round up if you\'re between sizes.');
+    const waistRow = document.createElement('div');
+    waistRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;';
+    ['28','29','30','31','32','33','34','36','38','40','42','44+'].forEach(w => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;min-height:40px;min-width:44px;touch-action:manipulation;';
+      btn.textContent = w;
+      btn.addEventListener('click', () => {
+        if (activeW) { activeW.style.borderColor='#e2e8f0'; activeW.style.background='#fff'; activeW.style.color=''; }
+        btn.style.borderColor='#B8844A'; btn.style.background='#B8844A'; btn.style.color='#fff';
+        activeW = btn; waist = w; errEl.style.display='none';
+      });
+      waistRow.appendChild(btn);
+    });
+    wrap.appendChild(waistRow);
+
+    makeSizingSection(wrap, 'Pant Inseam (L) *');
+    makeSizingTip(wrap, 'The L number on the same tag — or measure from your crotch seam to your ankle.');
+    const inseamRow = document.createElement('div');
+    inseamRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;';
+    ['28','29','30','31','32','33','34','36','38+'].forEach(l => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;min-height:40px;min-width:44px;touch-action:manipulation;';
+      btn.textContent = l;
+      btn.addEventListener('click', () => {
+        if (activeL) { activeL.style.borderColor='#e2e8f0'; activeL.style.background='#fff'; activeL.style.color=''; }
+        btn.style.borderColor='#B8844A'; btn.style.background='#B8844A'; btn.style.color='#fff';
+        activeL = btn; inseam = l; errEl.style.display='none';
+      });
+      inseamRow.appendChild(btn);
+    });
+    wrap.appendChild(inseamRow);
+
+    makeSizingSection(wrap, 'Pant Fit *');
+    makePillRow(wrap, ['Skinny','Slim','Straight','Relaxed'], v => { pantFit = v; }, true,
+      ['Hip, thigh & ankle','Hip & thigh','Modern straight','Loose throughout'], errEl);
+
+    wrap.appendChild(errEl);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm bottom sizing';
+    confirmBtn.style.marginTop = '14px';
+    confirmBtn.addEventListener('click', async () => {
+      if (!waist || !inseam || !pantFit) {
+        errEl.textContent = 'Please fill in all fields marked with *.';
+        errEl.style.display = 'block';
+        return;
+      }
+      const display = `Pants: W${waist} L${inseam} · ${pantFit} fit`;
+      outer.remove();
+      addMessage(display, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: {
+          'bottomBrand.primaryWaist': waist,
+          'bottomBrand.primaryInseam': inseam,
+          pantFit
+        },
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(confirmBtn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Section header ────────────────────────────────────────────────────────
+  function renderSectionHeader(title, subtitle) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:linear-gradient(135deg,#2C2118 0%,#3D2F22 100%);color:#FAF7F3;border-radius:16px;padding:18px 22px;margin:6px 0;box-shadow:0 4px 20px rgba(28,24,20,0.20);';
+    card.innerHTML = `
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.45;margin-bottom:6px;font-weight:600;font-family:'Inter',sans-serif;">Taelor Style Quiz</div>
+      <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:600;margin-bottom:4px;letter-spacing:-0.02em;">${title}</div>
+      <div style="font-size:13px;opacity:0.65;line-height:1.4;font-family:'Inter',sans-serif;">${subtitle}</div>
+    `;
+    outer.appendChild(card);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Garment image grid ───────────────────────────────────────────────────
+  function renderGarmentGrid(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+    addTip(wrap, 'doNotWant');
+
+    const hint = document.createElement('div');
+    hint.className = 'multi-hint';
+    hint.textContent = 'Tap to mark items you never want. Tap again to deselect.';
+    wrap.appendChild(hint);
+
+    const grid = document.createElement('div');
+    grid.className = 'garment-grid';
+    const selected = new Set();
+
+    widget.options.forEach(name => {
+      const card = document.createElement('div');
+      card.className = 'garment-card';
+
+      const img = document.createElement('img');
+      img.className = 'garment-img';
+      img.alt = name;
+      img.loading = 'lazy';
+      img.src = GARMENT_IMAGES[name] || `https://picsum.photos/seed/${name}/200/200`;
+      // Fallback on error
+      img.onerror = () => { img.style.background = '#e8e8e8'; img.style.opacity = '0'; };
+
+      const label = document.createElement('div');
+      label.className = 'garment-name';
+      label.textContent = name;
+
+      card.appendChild(img);
+      card.appendChild(label);
+
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        selected[card.classList.contains('selected') ? 'add' : 'delete'](name);
+        btn.disabled = selected.size === 0;
+      });
+
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm';
+    btn.disabled = true;
+    btn.addEventListener('click', async () => {
+      const value = [...selected];
+      outer.remove();
+      addMessage(value.length ? `Exclude: ${value.join(', ')}` : 'No exclusions', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value, tool_use_id: widget.tool_use_id });
+    });
+
+    // Also allow "None of these" to submit empty
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'I\'m open to everything';
+    skipBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Open to all clothing types', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
+    });
+
+    wrap.appendChild(skipBtn);
+    wrap.appendChild(btn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Image selector (outfit rounds) ───────────────────────────────────────
+  function renderImageSelector(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const rl = document.createElement('div');
+    rl.className = 'round-label';
+    rl.textContent = `Round ${widget.round} of ${widget.totalRounds}`;
+    wrap.appendChild(rl);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const hint = document.createElement('div');
+    hint.className = 'multi-hint';
+    hint.textContent = 'Select all that appeal to you';
+    wrap.appendChild(hint);
+
+    const grid = document.createElement('div');
+    grid.className = 'outfit-grid';
+    const selectedIds = new Set();
+
+    widget.outfits.forEach(outfit => {
+      const card = document.createElement('div');
+      card.className = 'outfit-card';
+
+      // Try real image, fallback to gradient
+      const img = document.createElement('img');
+      img.className = 'outfit-photo';
+      img.alt = outfit.style;
+      img.loading = 'lazy';
+      img.src = outfit.img;
+      img.onerror = () => {
+        // Replace with gradient fallback
+        const fallback = document.createElement('div');
+        fallback.className = 'outfit-photo-fallback';
+        fallback.style.background = outfit.bg || 'linear-gradient(145deg,#e8e8e8,#d0d0d0)';
+        fallback.textContent = outfit.emoji || '👕';
+        img.replaceWith(fallback);
+      };
+
+      const info = document.createElement('div');
+      info.className = 'outfit-info';
+      info.innerHTML = `<div class="outfit-style">${outfit.style}</div><div class="outfit-desc">${outfit.desc}</div>`;
+
+      card.appendChild(img);
+      card.appendChild(info);
+
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        if (card.classList.contains('selected')) {
+          selectedIds.add(outfit.id);
+        } else {
+          selectedIds.delete(outfit.id);
+        }
+        btn.disabled = selectedIds.size === 0;
+      });
+
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'None of these';
+    skipBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('None of these', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: null, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(skipBtn);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm Selection';
+    btn.disabled = true;
+    btn.addEventListener('click', async () => {
+      const chosen = widget.outfits.filter(o => selectedIds.has(o.id)).map(o => o.style);
+      outer.remove();
+      addMessage(chosen.join(', '), 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: [...selectedIds], tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Color picker ─────────────────────────────────────────────────────────
+  function renderColorPicker(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const hint = document.createElement('div');
+    hint.className = 'color-hint';
+    hint.innerHTML = `
+      <span><span class="hint-dot prefer"></span> Prefer</span>
+      <span><span class="hint-dot avoid"></span> Avoid</span>
+      <span style="color:#bbb">Tap to cycle</span>`;
+    wrap.appendChild(hint);
+
+    const grid = document.createElement('div');
+    grid.className = 'color-grid';
+    const state = {};
+
+    COLORS.forEach(color => {
+      const item = document.createElement('div');
+      item.className = 'color-swatch';
+
+      const dot = document.createElement('div');
+      dot.className = 'swatch-dot';
+      dot.style.background = color.bg || color.hex;
+      if (color.border) dot.style.borderColor = '#d0d0d0';
+
+      const name = document.createElement('div');
+      name.className = 'swatch-name';
+      name.textContent = color.name;
+
+      state[color.name] = null;
+
+      item.addEventListener('click', () => {
+        const curr = state[color.name];
+        dot.classList.remove('prefer', 'avoid');
+        if (!curr) {
+          state[color.name] = 'prefer';
+          dot.classList.add('prefer');
+        } else if (curr === 'prefer') {
+          state[color.name] = 'avoid';
+          dot.classList.add('avoid');
+        } else {
+          state[color.name] = null;
+        }
+      });
+
+      item.appendChild(dot);
+      item.appendChild(name);
+      grid.appendChild(item);
+    });
+    wrap.appendChild(grid);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Save preferences';
+    btn.addEventListener('click', async () => {
+      const prefer = Object.entries(state).filter(([,v]) => v === 'prefer').map(([k]) => k);
+      const avoid  = Object.entries(state).filter(([,v]) => v === 'avoid').map(([k]) => k);
+      const summary = prefer.length || avoid.length
+        ? [prefer.length ? `Prefer: ${prefer.join(', ')}` : '', avoid.length ? `Avoid: ${avoid.join(', ')}` : ''].filter(Boolean).join(' · ')
+        : 'Open to all';
+      outer.remove();
+      addMessage(summary, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { [widget.field_prefer]: prefer, [widget.field_avoid]: avoid },
+        value: summary,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Prints picker ────────────────────────────────────────────────────────
+  function renderPrintsPicker(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const hint = document.createElement('div');
+    hint.className = 'prints-hint';
+    hint.innerHTML = `
+      <span><span class="hint-dot prefer"></span> Prefer</span>
+      <span><span class="hint-dot avoid"></span> Avoid</span>
+      <span style="color:#bbb">Tap to cycle</span>`;
+    wrap.appendChild(hint);
+
+    const grid = document.createElement('div');
+    grid.className = 'prints-grid';
+    const state = {};
+
+    PRINTS.forEach(print => {
+      const item = document.createElement('div');
+      item.className = 'print-item';
+
+      const swatch = document.createElement('div');
+      swatch.className = 'print-swatch';
+      swatch.style.background = print.bg;
+      if (print.border) swatch.style.border = '1.5px solid #ddd';
+      if (print.text) {
+        swatch.textContent = print.text;
+        swatch.style.color = print.textColor || '#333';
+        swatch.style.fontSize = '18px';
+        swatch.style.fontWeight = '700';
+      }
+
+      const label = document.createElement('div');
+      label.className = 'print-label';
+      label.textContent = print.name;
+
+      state[print.name] = null;
+
+      item.addEventListener('click', () => {
+        const curr = state[print.name];
+        item.classList.remove('prefer', 'avoid');
+        if (!curr) {
+          state[print.name] = 'prefer';
+          item.classList.add('prefer');
+        } else if (curr === 'prefer') {
+          state[print.name] = 'avoid';
+          item.classList.add('avoid');
+        } else {
+          state[print.name] = null;
+        }
+        label.textContent = print.name;
+      });
+
+      item.appendChild(swatch);
+      item.appendChild(label);
+      grid.appendChild(item);
+    });
+    wrap.appendChild(grid);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Save print preferences';
+    btn.addEventListener('click', async () => {
+      const prefer = Object.entries(state).filter(([,v]) => v === 'prefer').map(([k]) => k);
+      const avoid  = Object.entries(state).filter(([,v]) => v === 'avoid').map(([k]) => k);
+      const summary = prefer.length || avoid.length
+        ? [prefer.length ? `Prefer: ${prefer.join(', ')}` : '', avoid.length ? `Avoid: ${avoid.join(', ')}` : ''].filter(Boolean).join(' · ')
+        : 'Open to all prints';
+      outer.remove();
+      addMessage(summary, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { [widget.field_prefer]: prefer, [widget.field_avoid]: avoid },
+        value: summary,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Photo upload ──────────────────────────────────────────────────────────
+  function renderPhotoUpload(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const desc = document.createElement('div');
+    desc.className = 'upload-desc';
+    desc.innerHTML = 'Nothing speaks better than pictures! Upload photos of:<ul><li>Your everyday casual look</li><li>A headshot</li><li>An outfit style that made you feel good</li></ul>';
+    wrap.appendChild(desc);
+
+    const subLbl = document.createElement('div');
+    subLbl.className = 'height-section-label';
+    subLbl.textContent = 'Add Photos';
+    wrap.appendChild(subLbl);
+
+    const grid = document.createElement('div');
+    grid.className = 'upload-grid';
+    const files = [null, null, null]; // up to 3 slots
+
+    function makeSlot(index) {
+      const box = document.createElement('div');
+      box.className = 'upload-box';
+
+      const icon = document.createElement('div');
+      icon.className = 'upload-box-icon';
+      icon.textContent = '+';
+      const label = document.createElement('div');
+      label.className = 'upload-box-label';
+      label.textContent = 'Upload';
+      box.appendChild(icon);
+      box.appendChild(label);
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.style.display = 'none';
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        files[index] = file.name;
+        const reader = new FileReader();
+        reader.onload = e => {
+          box.innerHTML = '';
+          box.classList.add('has-image');
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          const rm = document.createElement('div');
+          rm.className = 'upload-remove';
+          rm.textContent = '✕';
+          rm.addEventListener('click', ev => {
+            ev.stopPropagation();
+            files[index] = null;
+            box.innerHTML = '';
+            box.classList.remove('has-image');
+            box.appendChild(icon);
+            box.appendChild(label);
+          });
+          box.appendChild(img);
+          box.appendChild(rm);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      box.addEventListener('click', () => { if (!box.classList.contains('has-image')) fileInput.click(); });
+      box.appendChild(fileInput);
+      return box;
+    }
+
+    for (let i = 0; i < 3; i++) grid.appendChild(makeSlot(i));
+    wrap.appendChild(grid);
+
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'Skip for now';
+    skipBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Skipped photo upload', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(skipBtn);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Submit Photos';
+    btn.addEventListener('click', async () => {
+      const uploaded = files.filter(Boolean);
+      outer.remove();
+      addMessage(uploaded.length ? `${uploaded.length} photo${uploaded.length > 1 ? 's' : ''} shared` : 'No photos', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: uploaded, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Social handles ────────────────────────────────────────────────────────
+  function renderSocialHandles(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const tip = document.createElement('div');
+    tip.className = 'widget-tip';
+    tip.innerHTML = '<span class="widget-tip-icon">ⓘ</span><span>If you\'re active on social media and think it could help us know you better — share your handle or URL.</span>';
+    wrap.appendChild(tip);
+
+    const inputsWrap = document.createElement('div');
+    inputsWrap.className = 'social-inputs';
+    const inputs = ['#1', '#2', '#3'].map(ph => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'social-input';
+      inp.placeholder = ph;
+      inputsWrap.appendChild(inp);
+      return inp;
+    });
+    wrap.appendChild(inputsWrap);
+
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'Skip';
+    skipBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Skipped', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(skipBtn);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm';
+    btn.addEventListener('click', async () => {
+      const handles = inputs.map(i => i.value.trim()).filter(Boolean);
+      outer.remove();
+      addMessage(handles.length ? handles.join(', ') : 'Skipped', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: handles, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Brand search ──────────────────────────────────────────────────────────
+  function renderBrandSearch(widget) {
+    const POPULAR_BRANDS = [
+      // Mass / everyday
+      'Amazon','Costco','Target','Walmart','H&M','ZARA','Gap','Old Navy','Express',
+      'Goodfellow & Co.','Macy\'s','Nordstrom','Nordstrom Rack',
+      // Athleisure / sport
+      'Nike','Adidas','Under Armour','Lululemon','Vuori','Alo Yoga','Rhone','Gymshark',
+      'Outdoor Voices','On Running','New Balance','Puma','ASICS','Hoka','Brooks',
+      // Outdoor / performance
+      'Patagonia','The North Face','Arc\'teryx','Columbia','REI Co-op','Cotopaxi',
+      'Salomon','Merrell','Filson','Carhartt',
+      // Contemporary / elevated casual
+      'Uniqlo','Everlane','Allbirds','Banana Republic','J.Crew','Bonobos','Marine Layer',
+      'Buck Mason','Taylor Stitch','Mack Weldon','Cuts Clothing','Public Rec',
+      'Faherty','Outerknown','Entireworld','Reigning Champ','Champion','Stussy','Kith',
+      // Designer / luxury
+      'Ralph Lauren','Polo Ralph Lauren','Calvin Klein','Tommy Hilfiger','Hugo Boss',
+      'Theory','Rag & Bone','Todd Snyder','Club Monaco','Ted Baker','Scotch & Soda',
+      'John Varvatos','Billy Reid','Isaia','Brunello Cucinelli','Zegna',
+      // Streetwear / hype
+      'Supreme','Palace','Off-White','Fear of God','Essentials','Represent',
+      'A.P.C.','Acne Studios','Stone Island','CP Company','Noah',
+      // Denim
+      'Levi\'s','Wrangler','Lee','AG Jeans','Madewell','Frame','7 For All Mankind',
+      'True Religion','G-Star Raw','Nudie Jeans',
+      // Other popular
+      'Anthropologie Men\'s','Free People Movement','Abercrombie & Fitch','Hollister',
+      'American Eagle','Brooks Brothers','Haggar','Joseph Abboud',
+    ];
+
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    addTip(wrap, 'favoriteBrands');
+
+    // Selected chips
+    const selected = new Set();
+    const selectedWrap = document.createElement('div');
+    selectedWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;min-height:28px;';
+    wrap.appendChild(selectedWrap);
+
+    // Search input + dropdown
+    const searchWrap = document.createElement('div');
+    searchWrap.style.cssText = 'position:relative;margin-bottom:12px;';
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'social-input';
+    searchInput.placeholder = 'Search or type any brand...';
+    searchInput.autocomplete = 'off';
+    searchInput.setAttribute('autocomplete', 'off');
+    searchInput.setAttribute('autocorrect', 'off');
+    searchInput.setAttribute('spellcheck', 'false');
+    searchInput.style.cssText = 'width:100%;box-sizing:border-box;padding-right:80px;';
+    searchWrap.appendChild(searchInput);
+
+    const addBtn = document.createElement('button');
+    addBtn.textContent = '+ Add';
+    addBtn.style.cssText = 'position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:4px 10px;font-size:12px;background:#B8844A;color:#fff;border:none;border-radius:6px;cursor:pointer;';
+    searchWrap.appendChild(addBtn);
+
+    // Dropdown list (shows matched known brands)
+    const dropdown = document.createElement('div');
+    dropdown.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);z-index:50;display:none;max-height:240px;overflow-y:auto;overflow-x:hidden;';
+    searchWrap.appendChild(dropdown);
+    wrap.appendChild(searchWrap);
+
+    // Popular brand pills grid (shown when input is empty)
+    const suggestGrid = document.createElement('div');
+    suggestGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;';
+    wrap.appendChild(suggestGrid);
+
+    function makeSelectedChip(brand) {
+      const chip = document.createElement('button');
+      chip.style.cssText = 'padding:5px 10px;border-radius:20px;border:none;background:#B8844A;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;';
+      chip.innerHTML = `${brand} <span style="font-size:10px;opacity:0.7;">✕</span>`;
+      chip.addEventListener('click', () => {
+        selected.delete(brand);
+        chip.remove();
+        updateSuggestions(searchInput.value);
+      });
+      return chip;
+    }
+
+    function addBrand(name) {
+      const brand = name.trim();
+      if (!brand || selected.has(brand)) return;
+      selected.add(brand);
+      selectedWrap.appendChild(makeSelectedChip(brand));
+      searchInput.value = '';
+      dropdown.style.display = 'none';
+      updateSuggestions('');
+    }
+
+    function updateSuggestions(query) {
+      const q = query.toLowerCase().trim();
+
+      // Dropdown: show matching known brands when typing
+      dropdown.innerHTML = '';
+      if (q.length >= 1) {
+        // Starts-with first, then contains
+        const startsWith = POPULAR_BRANDS.filter(b => !selected.has(b) && b.toLowerCase().startsWith(q));
+        const contains  = POPULAR_BRANDS.filter(b => !selected.has(b) && !b.toLowerCase().startsWith(q) && b.toLowerCase().includes(q));
+        const matches = [...startsWith, ...contains].slice(0, 8);
+        if (matches.length) {
+          matches.forEach(brand => {
+            const row = document.createElement('div');
+            row.style.cssText = 'padding:11px 15px;cursor:pointer;font-size:14px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:8px;transition:background 0.1s;';
+            row.addEventListener('mouseenter', () => row.style.background = '#f8f8f8');
+            row.addEventListener('mouseleave', () => row.style.background = '');
+            // Bold matching portion
+            const idx = brand.toLowerCase().indexOf(q);
+            row.innerHTML = `<span style="font-size:13px;opacity:0.5;">↗</span>` +
+              `<span>` +
+              brand.substring(0, idx) +
+              `<strong style="font-weight:700;">${brand.substring(idx, idx + q.length)}</strong>` +
+              brand.substring(idx + q.length) +
+              `</span>`;
+            row.addEventListener('mousedown', e => { e.preventDefault(); addBrand(brand); });
+            dropdown.appendChild(row);
+          });
+          dropdown.style.display = 'block';
+        } else {
+          dropdown.style.display = 'none';
+        }
+        suggestGrid.style.display = 'none';
+      } else {
+        dropdown.style.display = 'none';
+        suggestGrid.style.display = 'flex';
+        // Repopulate popular pills
+        suggestGrid.innerHTML = '';
+        POPULAR_BRANDS.filter(b => !selected.has(b)).slice(0, 20).forEach(brand => {
+          const chip = document.createElement('button');
+          chip.className = 'chip';
+          chip.textContent = brand;
+          chip.addEventListener('click', () => addBrand(brand));
+          suggestGrid.appendChild(chip);
+        });
+      }
+    }
+
+    updateSuggestions('');
+
+    searchInput.addEventListener('input', () => updateSuggestions(searchInput.value));
+    searchInput.addEventListener('blur', () => setTimeout(() => { dropdown.style.display = 'none'; }, 150));
+    searchInput.addEventListener('focus', () => updateSuggestions(searchInput.value));
+
+    addBtn.addEventListener('click', () => {
+      const q = searchInput.value.trim();
+      if (!q) return;
+      // If query exactly matches a known brand (case-insensitive), use proper name
+      const match = POPULAR_BRANDS.find(b => b.toLowerCase() === q.toLowerCase());
+      addBrand(match || q);
+    });
+
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
+      if (e.key === 'Escape') { dropdown.style.display = 'none'; }
+    });
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm';
+    btn.addEventListener('click', async () => {
+      const brands = [...selected];
+      outer.remove();
+      addMessage(brands.length ? brands.join(', ') : 'No preference', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: brands, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(btn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+    setTimeout(() => searchInput.focus(), 100);
+  }
+
+  // ── Pant size picker ─────────────────────────────────────────────────────
+  function renderPantSizePicker(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+    addTip(wrap, 'pant_size');
+
+    let selectedW = null;
+    let selectedL = null;
+
+    function makeSection(title, values, onSelect) {
+      const secLabel = document.createElement('div');
+      secLabel.className = 'height-section-label';
+      secLabel.textContent = title;
+      wrap.appendChild(secLabel);
+
+      const row = document.createElement('div');
+      row.className = 'height-row';
+
+      values.forEach(v => {
+        const b = document.createElement('button');
+        b.className = 'height-btn';
+        b.textContent = v === 'Other' ? 'Other…' : v + '"';
+        b.addEventListener('click', () => {
+          row.querySelectorAll('.height-btn').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          if (v === 'Other') {
+            // Show inline input
+            let inp = row.querySelector('.size-custom-input');
+            if (!inp) {
+              inp = document.createElement('input');
+              inp.className = 'size-custom-input date-input';
+              inp.type = 'number';
+              inp.placeholder = 'Type size…';
+              inp.style.width = '90px';
+              inp.style.marginTop = '0';
+              inp.style.padding = '7px 10px';
+              inp.style.fontSize = '13px';
+              row.appendChild(inp);
+            }
+            inp.style.display = 'block';
+            inp.focus();
+            inp.addEventListener('input', () => {
+              onSelect(inp.value);
+              confirmBtn.disabled = selectedW === null || selectedL === null;
+            });
+          } else {
+            const inp = row.querySelector('.size-custom-input');
+            if (inp) inp.style.display = 'none';
+            onSelect(v);
+            confirmBtn.disabled = selectedW === null || selectedL === null;
+          }
+        });
+        row.appendChild(b);
+      });
+      wrap.appendChild(row);
+    }
+
+    const waistSizes  = ['28','29','30','31','32','33','34','35','36','37','38','39','40','42','44','Other'];
+    const inseamSizes = ['28','29','30','31','32','33','34','36','Other'];
+
+    makeSection('Waist (W)',       waistSizes,  v => { selectedW = v; });
+    makeSection('Pant Length (L)', inseamSizes, v => { selectedL = v; });
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm';
+    confirmBtn.disabled = true;
+    confirmBtn.style.marginTop = '14px';
+
+    confirmBtn.addEventListener('click', async () => {
+      const display = `W${selectedW} L${selectedL}`;
+      outer.remove();
+      addMessage(display, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { 'bottomBrand.primaryWaist': selectedW, 'bottomBrand.primaryInseam': selectedL },
+        value: display,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+
+    wrap.appendChild(confirmBtn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Date picker (native calendar dropdown) ───────────────────────────────
+  function renderDatePicker(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    const tip = document.createElement('div');
+    tip.className = 'widget-tip';
+    tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>To make sure your style is right for your age. We might even send you a birthday gift!</span>';
+    wrap.appendChild(tip);
+
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.className = 'dob-input year'; // reuse styling
+    input.style.width = '180px';
+    input.style.fontSize = '15px';
+    input.style.padding = '10px 14px';
+    const today = new Date().toISOString().split('T')[0];
+    input.max = today;
+    input.min = '1920-01-01';
+    wrap.appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.className = 'confirm-btn';
+    btn.textContent = 'Confirm';
+    btn.disabled = true;
+    btn.style.marginTop = '12px';
+    btn.style.display = 'block';
+
+    input.addEventListener('change', () => { btn.disabled = !input.value; });
+
+    btn.addEventListener('click', async () => {
+      const [y, m, d] = input.value.split('-');
+      const formatted = `${m}/${d}/${y}`;
+      outer.remove();
+      addMessage(formatted, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: formatted, tool_use_id: widget.tool_use_id });
+    });
+
+    wrap.appendChild(btn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+    input.focus();
+  }
+
+  // ── Height picker ─────────────────────────────────────────────────────────
+  function renderHeightPicker(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.textContent = widget.question;
+    wrap.appendChild(lbl);
+
+    let selectedFt = null;
+    let selectedIn = null;
+
+    // Feet row
+    const ftLabel = document.createElement('div');
+    ftLabel.className = 'height-section-label';
+    ftLabel.textContent = 'Feet';
+    wrap.appendChild(ftLabel);
+
+    const ftRow = document.createElement('div');
+    ftRow.className = 'height-row';
+    [4, 5, 6, 7].forEach(ft => {
+      const b = document.createElement('button');
+      b.className = 'height-btn';
+      b.textContent = ft + ' ft';
+      b.addEventListener('click', () => {
+        ftRow.querySelectorAll('.height-btn').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        selectedFt = ft;
+        confirmBtn.disabled = selectedFt === null || selectedIn === null;
+      });
+      ftRow.appendChild(b);
+    });
+    wrap.appendChild(ftRow);
+
+    // Inches row
+    const inLabel = document.createElement('div');
+    inLabel.className = 'height-section-label';
+    inLabel.textContent = 'Inches';
+    wrap.appendChild(inLabel);
+
+    const inRow = document.createElement('div');
+    inRow.className = 'height-row';
+    for (let i = 0; i <= 11; i++) {
+      const b = document.createElement('button');
+      b.className = 'height-btn';
+      b.textContent = i + ' in';
+      b.addEventListener('click', () => {
+        inRow.querySelectorAll('.height-btn').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        selectedIn = i;
+        confirmBtn.disabled = selectedFt === null || selectedIn === null;
+      });
+      inRow.appendChild(b);
+    }
+    wrap.appendChild(inRow);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm';
+    confirmBtn.disabled = true;
+    confirmBtn.style.marginTop = '12px';
+
+    confirmBtn.addEventListener('click', async () => {
+      const display = `${selectedFt}ft ${selectedIn}in`;
+      outer.remove();
+      addMessage(display, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { heightFt: String(selectedFt), heightIn: String(selectedIn) },
+        value: display,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+
+    wrap.appendChild(confirmBtn);
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── API ─────────────────────────────────────────────────────────────────
+
+  let lastSendArgs = null; // for retry
+
+  function showStillThinking() {
+    const el = document.getElementById('still-thinking');
+    if (el) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'still-thinking';
+    wrap.className = 'msg ai';
+    const b = document.createElement('div');
+    b.style.cssText = 'font-size:13px;color:#888;padding:8px 12px;background:#f7f7f5;border:1px solid #e5e5e5;border-radius:12px;display:flex;align-items:center;gap:8px;';
+    b.innerHTML = `<span style="font-size:16px;">⏳</span> Still thinking — thanks for your patience…`;
+    wrap.appendChild(b);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+  function hideStillThinking() { document.getElementById('still-thinking')?.remove(); }
+
+  function showErrorWithRetry(message, retryFn) {
+    removeTyping();
+    hideStillThinking();
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ai';
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:14px 16px;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;font-size:13px;color:#c53030;';
+    card.innerHTML = `<p style="margin-bottom:10px;">${message}</p>`;
+    const retryBtn = document.createElement('button');
+    retryBtn.textContent = 'Try again';
+    retryBtn.style.cssText = 'padding:7px 16px;background:#B8844A;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;';
+    retryBtn.addEventListener('click', () => { wrap.remove(); retryFn(); });
+    card.appendChild(retryBtn);
+    wrap.appendChild(card);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+    setInputDisabled(false);
+  }
+
+  async function apiFetch(url, body) {
+    const controller = new AbortController();
+    const thinkingTimer = setTimeout(() => showStillThinking(), 10000);
+    const timeoutTimer = setTimeout(() => controller.abort(), 35000);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      clearTimeout(thinkingTimer);
+      clearTimeout(timeoutTimer);
+      hideStillThinking();
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        if (res.status === 429) return { type: 'error', message: "You're moving fast — wait a moment and try again." };
+        return { type: 'error', message: err.error || 'Server error — please try again.' };
+      }
+      return await res.json();
+    } catch (err) {
+      clearTimeout(thinkingTimer);
+      clearTimeout(timeoutTimer);
+      hideStillThinking();
+      if (err.name === 'AbortError') return { type: 'error', message: "That took too long — the server may be busy." };
+      return { type: 'error', message: "Can't reach the server — check your connection." };
+    }
+  }
+
+  async function sendMessage(text) {
+    lastSendArgs = { type: 'chat', text };
+    setInputDisabled(true);
+    addTyping();
+    const data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: text });
+    removeTyping();
+    if (data.type === 'error') {
+      showErrorWithRetry(data.message, () => sendMessage(text));
+      return;
+    }
+    handleResponse(data);
+    return data;
+  }
+
+  async function submitWidget(payload) {
+    lastSendArgs = { type: 'widget', payload };
+    addTyping();
+    setInputDisabled(true);
+    const data = await apiFetch('/api/widget-response', { sessionId: SESSION_ID, ...payload });
+    removeTyping();
+    if (data.type === 'error') {
+      showErrorWithRetry(data.message, () => submitWidget(payload));
+      return;
+    }
+    handleResponse(data);
+  }
+
+  function handleResponse(data) {
+    if (data.profile) updateProfile(data.profile);
+    // Show "Start over" as soon as the quiz has begun
+    document.getElementById('start-over-btn').style.display = 'block';
+
+    if (data.type === 'section_header') {
+      renderSectionHeader(data.title, data.subtitle);
+      // Re-call AI to get the first question of this section
+      sendMessage('');
+      return;
+    } else if (data.type === 'widget') {
+      if (data.text) addMessage(data.text, 'ai');
+      renderWidget(data.widget);
+    } else if (data.type === 'finished') {
+      // 1. Show Claude's closing message as a normal chat bubble
+      if (data.text) addMessage(data.text, 'ai');
+
+      // 2. Render the completion card
+      const card = document.createElement('div');
+      card.className = 'completion-card';
+      card.innerHTML = `
+        <div class="completion-check">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.5 13.5L10.5 18.5L20.5 8" stroke="#FAF7F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="completion-headline">You're all set!</div>
+        <div class="completion-sub">Your style profile is complete. Here's what happens next.</div>
+        <div class="completion-steps">
+          <div class="completion-step">
+            <div class="completion-step-num">1</div>
+            <span>Your personal stylist reviews your profile and hand-picks pieces that match your style, fit, and lifestyle.</span>
+          </div>
+          <div class="completion-step">
+            <div class="completion-step-num">2</div>
+            <span>They'll text you to confirm your first shipment and answer any questions before it ships.</span>
+          </div>
+          <div class="completion-step">
+            <div class="completion-step-num">3</div>
+            <span>Your curated box arrives. Keep what you love, return the rest — no pressure.</span>
+          </div>
+        </div>
+        <a class="completion-cta" href="https://taelor.style" target="_blank" rel="noopener">Browse the collection →</a>
+      `;
+      messagesEl.appendChild(card);
+
+      // 3. Replace input bar with a locked state
+      const inputRow = document.getElementById('input-row');
+      inputRow.innerHTML = '<div class="input-locked">Your style profile has been submitted — your stylist will be in touch soon.</div>';
+
+      // 4. Update progress to 100%
+      progressFill.style.width = '100%';
+      progressPct.textContent = '100%';
+
+      scrollBottom();
+    } else if (data.type === 'handoff') {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg ai';
+      const banner = document.createElement('div');
+      banner.className = 'handoff-banner';
+      banner.innerHTML = `<p>${data.text}</p>`;
+      const cta = document.createElement('a');
+      cta.className = 'handoff-cta';
+      cta.textContent = 'Chat with a Stylist';
+      // Link to Taelor's contact/support — update with real URL
+      cta.href = 'mailto:stylist@taelor.style?subject=Style Quiz Help';
+      cta.target = '_blank';
+      banner.appendChild(cta);
+      wrap.appendChild(banner);
+      messagesEl.appendChild(wrap);
+      scrollBottom();
+      setInputDisabled(true);
+    } else {
+      // type === 'message' — a plain AI reply means no widget is pending
+      isWaitingForWidget = false;
+      if (data.text) {
+        addMessage(data.text, 'ai');
+        updateInputPlaceholder(data.text);
+      }
+      setInputDisabled(false);
+      userInput.focus();
+    }
+  }
+
+  // ── Input ────────────────────────────────────────────────────────────────
+
+  sendBtn.addEventListener('click', () => {
+    const text = userInput.value.trim();
+    if (!text || isWaitingForWidget) return;
+    userInput.value = '';
+    addMessage(text, 'user');
+    sendMessage(text);
+  });
+
+  userInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendBtn.click();
+  });
+
+  // ── iOS keyboard: scroll input into view when keyboard appears ───────────
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      // When keyboard opens on iOS, viewport shrinks — scroll to keep input visible
+      const inputRow = document.getElementById('input-row');
+      if (inputRow) inputRow.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    });
+  }
+
+  // ── Auto-start / Resume ──────────────────────────────────────────────────
+  setInputDisabled(true);
+  updateProfile({});
+
+  function confirmStartOver() {
+    if (!confirm('Start the quiz over from the beginning? Your current progress will be cleared.')) return;
+    startFresh();
+  }
+
+  function startFresh() {
+    SESSION_ID = makeSessionId();
+    localStorage.setItem(STORAGE_KEY, SESSION_ID);
+    messagesEl.innerHTML = '';
+    isWaitingForWidget = false;
+    updateProfile({});
+    document.getElementById('start-over-btn').style.display = 'none';
+    sendMessage('').then(data => {
+      if (!data && messagesEl.querySelectorAll('.msg').length === 0) {
+        sendMessage('Please start the quiz by asking for my phone number.');
+      }
+    });
+  }
+
+  function showResumeBanner(profile) {
+    // Legacy — kept so old references don't throw. Auto-resume is now silent.
+    if (profile) updateProfile(profile);
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ai';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;font-size:13px;';
+    card.innerHTML = `<p style="font-weight:600;margin-bottom:6px;">Welcome back! 👋</p><p style="color:#555;margin-bottom:10px;">You were in the middle of your style quiz. Want to pick up where you left off?</p>`;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;';
+    const contBtn = document.createElement('button');
+    contBtn.textContent = 'Continue quiz';
+    contBtn.style.cssText = 'flex:1;padding:9px 0;background:#B8844A;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;';
+    contBtn.addEventListener('click', () => {
+      wrap.remove();
+      sendMessage('Continue the quiz from where we left off.');
+    });
+    const freshBtn = document.createElement('button');
+    freshBtn.textContent = 'Start fresh';
+    freshBtn.style.cssText = 'flex:1;padding:9px 0;background:#FAF7F3;color:#1C1814;border:1px solid #D9D1C7;border-radius:8px;font-size:13px;cursor:pointer;';
+    freshBtn.addEventListener('click', () => { wrap.remove(); startFresh(); });
+    row.appendChild(contBtn);
+    row.appendChild(freshBtn);
+    card.appendChild(row);
+    wrap.appendChild(card);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+    setInputDisabled(false);
+  }
+
+  function showOfflineMessage() {
+    removeTyping();
+    setInputDisabled(true);
+    const wrap = document.createElement('div');
+    wrap.id = 'offline-msg';
+    wrap.className = 'msg ai';
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:16px 18px;background:#fff5f5;border:1px solid #fed7d7;border-radius:14px;font-size:14px;color:#c53030;';
+    card.innerHTML = `<p style="margin-bottom:12px;font-weight:500;">Couldn't connect to the server.</p><p style="font-size:13px;color:#888;margin-bottom:12px;">Make sure the server is running, then reload the page.</p>`;
+    const reloadBtn = document.createElement('button');
+    reloadBtn.textContent = 'Reload page';
+    reloadBtn.style.cssText = 'padding:8px 18px;background:#B8844A;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;';
+    reloadBtn.addEventListener('click', () => location.reload());
+    card.appendChild(reloadBtn);
+    wrap.appendChild(card);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  (async () => {
+    // Show typing indicator immediately so the screen is never blank
+    addTyping();
+
+    try {
+      const check = await fetch('/api/session/' + SESSION_ID);
+      if (!check.ok) throw new Error('session check failed');
+      const { exists, profile } = await check.json();
+
+      removeTyping();
+
+      if (exists) {
+        // Session found — auto-resume silently, no banner
+        if (profile) updateProfile(profile);
+        document.getElementById('start-over-btn').style.display = 'block';
+        await sendMessage('Continue the quiz from where we left off. Do not re-introduce yourself or repeat questions already answered. Pick up at the next unanswered question.');
+      } else {
+        // Fresh session
+        document.getElementById('start-over-btn').style.display = 'none';
+        await sendMessage('');
+      }
+    } catch {
+      // Server unreachable on load — show a clear offline message, don't retry blindly
+      removeTyping();
+      showOfflineMessage();
+    }
+  })();
+</script>
+</body>
+</html>
