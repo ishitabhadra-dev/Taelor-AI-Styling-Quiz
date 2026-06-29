@@ -1160,7 +1160,7 @@ app.use((err, req, res, _next) => {
 });
 
 // ─── Local session TTL cleanup (file mode only — KV uses built-in TTL) ────────
-if (!kv) {
+if (!USE_KV) {
   const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
   setInterval(() => {
     const cutoff = Date.now() - SESSION_TTL_MS;
@@ -1183,7 +1183,7 @@ if (require.main === module) {
   function shutdown(signal) {
     console.log(`\n[${signal}] Shutting down gracefully…`);
     if (saveTimer) clearTimeout(saveTimer);
-    if (!kv) {
+    if (!USE_KV) {
       try { fs.writeFileSync(SESSION_FILE, JSON.stringify(sessions)); }
       catch (e) { console.error('Final session save failed:', e.message); }
     }
@@ -1195,7 +1195,7 @@ if (require.main === module) {
 
   const server = app.listen(PORT, () => {
     console.log(`\n🎽  Taelor AI Quiz  →  http://localhost:${PORT}`);
-    console.log(`    env: ${process.env.NODE_ENV || 'development'} | storage: ${kv ? 'Vercel KV' : 'local file'}\n`);
+    console.log(`    env: ${process.env.NODE_ENV || 'development'} | storage: ${USE_KV ? 'Upstash KV' : 'local file'}\n`);
   });
 } else {
   // Imported by Vercel serverless function
