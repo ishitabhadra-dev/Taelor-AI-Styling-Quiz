@@ -57,16 +57,18 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: '64kb' }));
-// Static files served by Vercel CDN in production; serve locally in dev
-if (!process.env.VERCEL) {
-  app.use(express.static(path.join(__dirname), {
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith('.json') || filePath.endsWith('.env')) {
-        res.statusCode = 403;
-      }
+// Serve static files (index.html, etc.)
+app.use(express.static(path.join(__dirname), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.json') || filePath.endsWith('.env')) {
+      res.statusCode = 403;
     }
-  }));
-}
+  }
+}));
+// Explicit root handler for Vercel
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
