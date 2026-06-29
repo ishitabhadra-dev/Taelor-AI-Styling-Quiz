@@ -1027,7 +1027,7 @@
   // ── Session ID — fresh session every page load ───────────────────────────
   const STORAGE_KEY = 'taelor_quiz_session_id';
   function makeSessionId() { return 'sess_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  const SESSION_ID = makeSessionId();
+  let SESSION_ID = makeSessionId();
   localStorage.setItem(STORAGE_KEY, SESSION_ID);
 
   const messagesEl          = document.getElementById('messages');
