@@ -1024,14 +1024,11 @@
 </div><!-- #page -->
 
 <script>
-  // ── Session ID — persist across page loads ───────────────────────────────
+  // ── Session ID — fresh session every page load ───────────────────────────
   const STORAGE_KEY = 'taelor_quiz_session_id';
   function makeSessionId() { return 'sess_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  let SESSION_ID = localStorage.getItem(STORAGE_KEY);
-  if (!SESSION_ID || !/^[a-z0-9_]{5,60}$/.test(SESSION_ID)) {
-    SESSION_ID = makeSessionId();
-    localStorage.setItem(STORAGE_KEY, SESSION_ID);
-  }
+  const SESSION_ID = makeSessionId();
+  localStorage.setItem(STORAGE_KEY, SESSION_ID);
 
   const messagesEl          = document.getElementById('messages');
   const profileFields       = document.getElementById('profile-fields');
@@ -2988,20 +2985,11 @@
   (async () => {
     // Show typing indicator immediately so the screen is never blank
     addTyping();
-
     try {
-      const check = await fetch('/api/session/' + SESSION_ID);
-      if (!check.ok) throw new Error('session check failed');
-      const { exists, profile } = await check.json();
-
       removeTyping();
-
-      // Always start fresh — resume causes issues when sessions have partial history
-      if (exists && profile) updateProfile(profile);
       document.getElementById('start-over-btn').style.display = 'none';
       await sendMessage('');
     } catch {
-      // Server unreachable on load — show a clear offline message, don't retry blindly
       removeTyping();
       showOfflineMessage();
     }
