@@ -73,16 +73,34 @@ app.get('/', (req, res) => {
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ─── Session storage ──────────────────────────────────────────────────────────
-// Uses Vercel KV (Redis) when KV env vars are present (production on Vercel).
+// Uses Upstash REST API directly (no package) when env vars present.
 // Falls back to in-memory + local JSON file for local development.
 
 const sessions = {}; // in-memory cache (always used)
 
-// Vercel KV setup — only loaded when env vars exist
-let kv = null;
-if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-  try { kv = require('@vercel/kv').kv; console.log('[KV] Vercel KV connected.'); }
-  catch (e) { console.warn('[KV] @vercel/kv not available, using file fallback.'); }
+const KV_URL   = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const USE_KV   = !!(KV_URL && KV_TOKEN);
+if (USE_KV) console.log('[KV] Upstash REST connected.');
+
+async function kvGet(key) {
+  try {
+    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${KV_TOKEN}` }
+    });
+    const data = await res.json();
+    return data.result ? JSON.parse(data.result) : null;
+  } catch (e) { console.error('[KV] get error:', e.message); return null; }
+}
+
+async function kvSet(key, value, ttlSec) {
+  try {
+    await fetch(`${KV_URL}/pipeline`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${KV_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify([['SET', key, JSON.stringify(value), 'EX', ttlSec]])
+    });
+  } catch (e) { console.error('[KV] set error:', e.message); }
 }
 
 // Local file fallback (dev only)
@@ -99,7 +117,7 @@ function scheduleSave() {
   }, 1000);
 }
 function loadSessions() {
-  if (kv) return; // KV handles persistence — no file load needed
+  if (USE_KV) return;
   try {
     if (fs.existsSync(SESSION_FILE)) {
       const parsed = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
@@ -114,20 +132,17 @@ const KV_PREFIX = 'taelor:session:';
 
 async function getSession(id) {
   if (sessions[id]) return sessions[id]; // warm cache hit
-  if (kv) {
-    try {
-      const stored = await kv.get(KV_PREFIX + id);
-      if (stored) { sessions[id] = stored; return stored; }
-    } catch (e) { console.error('[KV] getSession error:', e.message); }
+  if (USE_KV) {
+    const stored = await kvGet(KV_PREFIX + id);
+    if (stored) { sessions[id] = stored; return stored; }
   }
   sessions[id] = { messages: [], profile: {}, pendingToolResults: [], createdAt: Date.now() };
   return sessions[id];
 }
 
 async function saveSession(id) {
-  if (kv) {
-    try { await kv.set(KV_PREFIX + id, sessions[id], { ex: SESSION_TTL_SEC }); }
-    catch (e) { console.error('[KV] saveSession error:', e.message); }
+  if (USE_KV) {
+    await kvSet(KV_PREFIX + id, sessions[id], SESSION_TTL_SEC);
   } else {
     scheduleSave();
   }
