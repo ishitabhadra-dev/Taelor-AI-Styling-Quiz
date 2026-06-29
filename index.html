@@ -2996,16 +2996,10 @@
 
       removeTyping();
 
-      if (exists) {
-        // Session found — auto-resume silently, no banner
-        if (profile) updateProfile(profile);
-        document.getElementById('start-over-btn').style.display = 'block';
-        await sendMessage('Continue the quiz from where we left off. Do not re-introduce yourself or repeat questions already answered. Pick up at the next unanswered question.');
-      } else {
-        // Fresh session
-        document.getElementById('start-over-btn').style.display = 'none';
-        await sendMessage('');
-      }
+      // Always start fresh — resume causes issues when sessions have partial history
+      if (exists && profile) updateProfile(profile);
+      document.getElementById('start-over-btn').style.display = 'none';
+      await sendMessage('');
     } catch {
       // Server unreachable on load — show a clear offline message, don't retry blindly
       removeTyping();
