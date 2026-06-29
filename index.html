@@ -2809,11 +2809,12 @@
     document.getElementById('start-over-btn').style.display = 'block';
 
     if (data.type === 'section_header') {
+      // Legacy fallback — server now returns sectionHeader inline with widget
       renderSectionHeader(data.title, data.subtitle);
-      // Re-call AI to get the first question of this section
       sendMessage('');
       return;
     } else if (data.type === 'widget') {
+      if (data.sectionHeader) renderSectionHeader(data.sectionHeader.title, data.sectionHeader.subtitle);
       if (data.text) addMessage(data.text, 'ai');
       renderWidget(data.widget);
     } else if (data.type === 'finished') {

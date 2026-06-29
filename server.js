@@ -892,14 +892,10 @@ async function runTurn(session, userMessage) {
             toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Profile updated.' });
 
           } else if (block.name === 'present_section_header') {
-            // Non-blocking — save result, return header to frontend which will re-call to get first question
+            // Continue the loop server-side — don't return early and force a second HTTP request.
+            // Store the header info and attach it to the next widget/message response.
             toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Section header shown.' });
-            session.messages.push({ role: 'user', content: toolResults });
-            return {
-              type: 'section_header',
-              title: block.input.title,
-              subtitle: block.input.subtitle
-            };
+            session._pendingSectionHeader = { title: block.input.title, subtitle: block.input.subtitle };
 
           } else if (block.name === 'present_options') {
             const hasDescriptions = Array.isArray(block.input.descriptions) && block.input.descriptions.length > 0;
@@ -1038,7 +1034,9 @@ async function runTurn(session, userMessage) {
         // Instead, stash any prior tool_results (e.g. from update_profile calls that
         // ran before the widget) so /api/widget-response can merge them in.
         session.pendingToolResults = toolResults;
-        return { type: 'widget', text: textBeforeWidget, widget: widgetToRender };
+        const sectionHeader = session._pendingSectionHeader || null;
+        delete session._pendingSectionHeader;
+        return { type: 'widget', text: textBeforeWidget, widget: widgetToRender, sectionHeader };
       }
 
       session.messages.push({ role: 'user', content: toolResults });
