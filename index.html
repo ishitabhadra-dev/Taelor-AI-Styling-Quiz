@@ -2986,18 +2986,35 @@
   (async () => {
     // Show typing indicator immediately so the screen is never blank
     addTyping();
-    try {
-      // Warm up the serverless function first, then start quiz
-      // This ensures the cold start happens before the Claude API call
-      await fetch('/health').catch(() => {});
-      await new Promise(r => setTimeout(r, 500));
+
+    // Warm up the serverless function (kicks it out of cold start)
+    await fetch('/health').catch(() => {});
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Auto-retry the first chat request up to 3 times so users never need to reload
+    let data;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        // Brief pause between retries, keep typing indicator visible
+        await new Promise(r => setTimeout(r, 2000));
+      }
       removeTyping();
-      document.getElementById('start-over-btn').style.display = 'none';
-      await sendMessage('');
-    } catch {
+      setInputDisabled(true);
+      addTyping();
+      data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '' });
       removeTyping();
-      showOfflineMessage();
+      if (data.type !== 'error') break;
     }
+
+    document.getElementById('start-over-btn').style.display = 'none';
+    lastSendArgs = { type: 'chat', text: '' };
+
+    if (!data || data.type === 'error') {
+      showErrorWithRetry(data?.message || "Couldn't connect to the server.", () => sendMessage(''));
+      return;
+    }
+
+    handleResponse(data);
   })();
 </script>
 </body>
