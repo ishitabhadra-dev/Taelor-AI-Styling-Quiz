@@ -2920,18 +2920,40 @@
     startFresh();
   }
 
+  async function launchQuiz() {
+    addTyping();
+    await fetch('/health').catch(() => {});
+    await new Promise(r => setTimeout(r, 1000));
+
+    let data;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
+      removeTyping();
+      setInputDisabled(true);
+      addTyping();
+      data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '' });
+      removeTyping();
+      if (data.type !== 'error') break;
+    }
+
+    lastSendArgs = { type: 'chat', text: '' };
+    document.getElementById('start-over-btn').style.display = 'none';
+
+    if (!data || data.type === 'error') {
+      showErrorWithRetry(data?.message || "Couldn't connect to the server.", () => sendMessage(''));
+      return;
+    }
+
+    handleResponse(data);
+  }
+
   function startFresh() {
     SESSION_ID = makeSessionId();
     localStorage.setItem(STORAGE_KEY, SESSION_ID);
     messagesEl.innerHTML = '';
     isWaitingForWidget = false;
     updateProfile({});
-    document.getElementById('start-over-btn').style.display = 'none';
-    sendMessage('').then(data => {
-      if (!data && messagesEl.querySelectorAll('.msg').length === 0) {
-        sendMessage('Please start the quiz by asking for my phone number.');
-      }
-    });
+    launchQuiz();
   }
 
   function showResumeBanner(profile) {
@@ -2983,39 +3005,7 @@
     scrollBottom();
   }
 
-  (async () => {
-    // Show typing indicator immediately so the screen is never blank
-    addTyping();
-
-    // Warm up the serverless function (kicks it out of cold start)
-    await fetch('/health').catch(() => {});
-    await new Promise(r => setTimeout(r, 1000));
-
-    // Auto-retry the first chat request up to 3 times so users never need to reload
-    let data;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) {
-        // Brief pause between retries, keep typing indicator visible
-        await new Promise(r => setTimeout(r, 2000));
-      }
-      removeTyping();
-      setInputDisabled(true);
-      addTyping();
-      data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '' });
-      removeTyping();
-      if (data.type !== 'error') break;
-    }
-
-    document.getElementById('start-over-btn').style.display = 'none';
-    lastSendArgs = { type: 'chat', text: '' };
-
-    if (!data || data.type === 'error') {
-      showErrorWithRetry(data?.message || "Couldn't connect to the server.", () => sendMessage(''));
-      return;
-    }
-
-    handleResponse(data);
-  })();
+  launchQuiz();
 </script>
 </body>
 </html>
