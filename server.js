@@ -886,6 +886,8 @@ async function runTurn(session, userMessage) {
     session.messages.push({ role: 'user', content: "Hello, let's start the style quiz." });
   }
 
+  let nudges = 0; // guard against infinite nudge loops
+
   while (true) {
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -898,7 +900,15 @@ async function runTurn(session, userMessage) {
     session.messages.push({ role: 'assistant', content: response.content });
 
     if (response.stop_reason === 'end_turn') {
-      const text = response.content.find(b => b.type === 'text')?.text || '';
+      const text = (response.content.find(b => b.type === 'text')?.text || '').trim();
+      if (!text && nudges < 2) {
+        // Claude returned empty text (e.g. after processing present_section_header it went silent).
+        // Nudge it to continue rather than returning a blank message to the client.
+        nudges++;
+        console.log(`[TURN] Empty end_turn — nudging Claude to continue (attempt ${nudges})`);
+        session.messages.push({ role: 'user', content: 'Please continue.' });
+        continue;
+      }
       return { type: 'message', text };
     }
 

@@ -2933,7 +2933,9 @@
       addTyping();
       data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '' });
       removeTyping();
-      if (data.type !== 'error') break;
+      // Retry if error OR if server returned an empty message (Claude went silent)
+      const emptyResponse = data.type === 'message' && !data.text;
+      if (data.type !== 'error' && !emptyResponse) break;
     }
 
     lastSendArgs = { type: 'chat', text: '' };
