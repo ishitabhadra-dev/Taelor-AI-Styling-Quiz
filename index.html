@@ -2989,7 +2989,22 @@
     try {
       removeTyping();
       document.getElementById('start-over-btn').style.display = 'none';
-      await sendMessage('');
+      // Try up to 3 times with delay — handles Vercel cold starts
+      let lastErr;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          if (attempt > 0) {
+            addTyping();
+            await new Promise(r => setTimeout(r, 2000 * attempt));
+            removeTyping();
+          }
+          const result = await sendMessage('');
+          if (result) break; // success
+        } catch (e) {
+          lastErr = e;
+          removeTyping();
+        }
+      }
     } catch {
       removeTyping();
       showOfflineMessage();
