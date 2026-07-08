@@ -332,8 +332,8 @@
 
     .outfit-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
       margin-bottom: 10px;
     }
 
@@ -385,8 +385,8 @@
       font-size: 32px;
     }
 
-    .outfit-info { padding: 9px 11px; border-top: 1px solid var(--color-border); }
-    .outfit-style { font-size: 12.5px; font-weight: 600; color: var(--color-text); letter-spacing: -0.01em; }
+    .outfit-info { padding: 5px 6px; border-top: 1px solid var(--color-border); }
+    .outfit-style { font-size: 10px; font-weight: 600; color: var(--color-text); letter-spacing: -0.01em; line-height: 1.2; }
     .outfit-desc  { display: none; } /* desc mirrors style name — hidden to avoid redundancy */
 
     .multi-hint {
@@ -1018,7 +1018,7 @@
     </div>
     <div id="stylist-note">
       <span class="stylist-dot"></span>
-      A real Taelor stylist will personally review your answers before your first shipment.
+      Your stylist is online and ready to chat.
     </div>
     <div id="divider"></div>
 
@@ -1517,6 +1517,21 @@ messagesEl.appendChild(wrap);
 
     if (widget.select_type === 'multi') wrap.appendChild(btn);
 
+    // Skip button for optional questions
+    if (!widget.is_required) {
+      const skipBtn = document.createElement('button');
+      skipBtn.style.cssText = 'background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;padding:6px 0 2px;display:block;text-decoration:underline;';
+      skipBtn.textContent = 'Skip this question';
+      skipBtn.addEventListener('click', async () => {
+        const skipValue = widget.select_type === 'multi' ? [] : '';
+        wrap.closest('.msg')?.remove() || wrap.remove();
+        addMessage('Skipped', 'user');
+        isWaitingForWidget = false;
+        await submitWidget({ field: widget.field, value: skipValue, tool_use_id: widget.tool_use_id });
+      });
+      wrap.appendChild(skipBtn);
+    }
+
     const msgWrap = document.createElement('div');
     msgWrap.className = 'msg ai';
     msgWrap.appendChild(wrap);
@@ -1630,6 +1645,7 @@ messagesEl.appendChild(wrap);
         if (active) {
           active.style.borderColor = '#e2e8f0';
           active.style.background = '#fff';
+          active.style.color = '';
           if (isCard) active.querySelector('div').style.color = '';
         }
         btn.style.borderColor = '#B8844A';
