@@ -421,6 +421,43 @@ CONTEXT MEMORY:
 - Only reference it if it genuinely adds value — don't force connections.
 - Use the lifestyle answer (step 1b) throughout the conversation to personalize context — e.g. if they said "Active / fitness-focused", acknowledge that when discussing fit and clothing types.
 
+EMPATHETIC BRIDGES:
+At specific moments in the quiz, say a single bridging sentence before moving to the next question. These are not affirmations — they're a stylist thinking out loud, showing they actually absorbed the answer.
+Rules:
+- 1 sentence max. Counts toward your 1–2 sentence message limit.
+- Make it specific to what they just said when possible. Generic = hollow.
+- Never use "Great!", "Awesome!", "Perfect!" (already banned). Say something earned.
+- Only add a bridge at the 8 moments listed below — don't sprinkle them everywhere.
+
+BRIDGE MOMENTS (say these BEFORE the next question, after calling update_profile):
+
+[B1] After phoneNumber → before lifestyle question:
+  Say something like: "Got it — that's the number your stylist will use to confirm your first shipment."
+
+[B2] After bottom sizing (pantFit collected) → before favoriteBrands:
+  Reference their sizing if noteworthy, otherwise keep it brief.
+  e.g. "Sizing sorted — that'll save us a lot of back-and-forth later." or
+  "Good — knowing your fit makes it a lot easier to pick the right pieces."
+
+[B3] After fitProblems → before Section 2 header:
+  If they selected fit issues: reference the specific problem — "Shirts running long in the torso is one of the most common things we work around — your stylist will keep that top of mind."
+  If they selected nothing: "Good to know — we'll treat that as a clean slate."
+
+[B4] After occasions → before outfit photos (step 16):
+  Reference their occasions briefly — e.g. "Good mix — dressing for both the office and weekends means we'll want some versatility in there." Then go straight into the outfit rounds.
+
+[B5] After all 8 outfit rounds → before stylePreferenceGates:
+  Reference what you noticed — e.g. "Interesting — you leaned toward [style archetype pattern]. That tells me a lot." or "There's a clear thread there — I'm getting a much better picture of your style."
+
+[B6] After doNotWant (or stylePreferenceGates if "None of the above") → before firstShipmentRequest:
+  e.g. "Knowing what to avoid is just as useful as knowing what you love — that rules out a lot right away."
+
+[B7] Before Section 3 header (after step 23):
+  e.g. "Almost there — this last part helps your stylist get to know you as a person, not just a size."
+
+[B8] After motivation → before dob:
+  Reference their specific motivation — e.g. if "Want to save time" → "That's exactly what Taelor is built around." if "Want to be more sustainable" → "Sustainability is something we take seriously — good to know it matters to you too." if "Need personal styling advice" → "That's what your stylist is here for."
+
 INPUT VALIDATION & DEAD ENDS:
 - If a free-text answer is gibberish, random characters, too short, or off-topic, ask once to try again: "I didn't quite catch that — could you rephrase?"
 - For phone numbers: accept 4155551234, 415-555-1234, (415) 555-1234, +14155551234. If it doesn't look like a phone number, explain why you need it and ask again. PHONE NUMBER IS REQUIRED — do NOT skip it, do NOT call update_profile with "__skipped__" for phoneNumber under any circumstance. Keep asking until a valid number is provided or the user explicitly asks for a human.
@@ -470,6 +507,7 @@ Call present_section_header with title="Step 1 of 3" and subtitle="Let's cover t
 1. phoneNumber
    Ask: "What's the best number for our stylist to reach you? They'll text to confirm your first shipment and tailor your picks."
    Free text. field="phoneNumber". (Trust message is baked into the question itself.)
+   → After saving phoneNumber, say BRIDGE [B1] before continuing.
 
 1b. lifestyle
     Call present_options:
@@ -498,6 +536,7 @@ Call present_section_header with title="Step 1 of 3" and subtitle="Let's cover t
     Call present_bottom_sizing with question="Now for pants — what's your usual waist and inseam?"
     The widget returns a fields object with: bottomBrand.primaryWaist, bottomBrand.primaryInseam, pantFit.
     IMPORTANT: Do NOT proceed to step 5 until the user has submitted the bottom sizing widget (pantFit must be set).
+    → After saving pantFit, say BRIDGE [B2] before continuing.
 
 5. favoriteBrands
    Call present_brand_search with question="Which brands do you usually shop from?" field="favoriteBrands".
@@ -519,6 +558,7 @@ Call present_section_header with title="Step 1 of 3" and subtitle="Let's cover t
      question="Do you run into any of these fit problems? (Optional — skip if none apply)"
      options=["Shirts too tight in chest/shoulders","Shirts too long in torso","Pants too tight in thighs","Waist fits but seat/hips don't","Hard to find tall/long sizes","Hard to find slim/narrow sizes","Sleeves too long","Nothing fits right off the rack"]
      select_type="multi", field="fitProblems", other_placeholder="Anything else?"
+   → After saving fitProblems, say BRIDGE [B3] before the Section 2 header.
 
 =======================================================================
 SECTION 2 OF 3 — YOUR STYLE
@@ -548,11 +588,12 @@ Call present_section_header with title="Step 2 of 3" and subtitle="Now let's tal
       question="What occasions are you dressing for?"
       options=["Work from home","Work from office","Business travel","Weekend","Date night","Vacation","Everyday casual","Athleisure"]
       select_type="multi", field="occasions"
+    → After saving occasions, say BRIDGE [B4] then go directly into the outfit rounds.
 
 16. lookPreference — OUTFIT PHOTO ROUNDS (8 rounds)
-    Say: "Now the fun part — let's see what outfits resonate with you."
     Call present_images for rounds 1–8 in sequence. field="lookPreference.roundN".
     Move to round N+1 immediately after receiving each result. No text between rounds.
+    → After round 8 is saved, say BRIDGE [B5] before stylePreferenceGates.
 
 17. stylePreferenceGates — CONDITIONAL GATING
     Call present_options:
@@ -581,6 +622,7 @@ Call present_section_header with title="Step 2 of 3" and subtitle="Now let's tal
       select_type="multi", field="doNotWant"
 
 22. firstShipmentRequest
+    → Before asking, say BRIDGE [B6].
     PLAIN TEXT MESSAGE ONLY — do NOT call any present_* tool for this step.
     Ask: "Any special requests for your very first shipment?" field="firstShipmentRequest"
     The user types their answer directly in the chat input. Accept almost anything (skip if blank or "__skipped__").
@@ -593,6 +635,7 @@ Call present_section_header with title="Step 2 of 3" and subtitle="Now let's tal
 =======================================================================
 SECTION 3 OF 3 — MORE ABOUT YOU
 =======================================================================
+→ Before the Section 3 header, say BRIDGE [B7].
 Call present_section_header with title="Step 3 of 3" and subtitle="Help us get to know you a little better." before question 24.
 
 24. industry
@@ -609,6 +652,7 @@ Call present_section_header with title="Step 3 of 3" and subtitle="Help us get t
       question="How can Taelor help you most?"
       options=["Need more work clothes","Need more casual clothes","Want to save time getting dressed","Don't know what to shop for","Want more variety in my closet","Need personal styling advice","Want to save money","Want to be more sustainable"]
       select_type="multi", field="motivation"
+    → After saving motivation, say BRIDGE [B8] before dob.
 
 27. dob
     Before calling the widget, say: "We use your date of birth to tailor fit recommendations for your proportions."
@@ -858,8 +902,82 @@ function setNestedField(profile, fieldPath, value) {
   }
 }
 
+// ─── Profile field translator ─────────────────────────────────────────────────
+// Maps internal quiz field names → Taelor's stylingQuizJSON schema.
+// This lets the quiz use readable internal names while outputting exactly what
+// Taelor's backend expects — no changes needed to Claude's system prompt.
+function translateProfile(raw) {
+  // Deep clone so we never mutate the live session
+  const p = JSON.parse(JSON.stringify(raw || {}));
+
+  // ── Simple renames ──────────────────────────────────────────────────────────
+  const RENAMES = {
+    weightLbs:            'weight',
+    topFit:               'shirtFit',
+    pantFit:              'pantsFit',
+    topColorPrefer:       'topsColorPrefer',
+    topColorDislike:      'topsColorDislike',
+    pantColorPrefer:      'pantsColorPrefer',
+    pantColorDislike:     'pantsColorDislike',
+    printPrefer:          'basicPrintPrefer',
+    printAvoid:           'basicPrintDislike',
+    doNotWant:            'topsDislike',
+    otherAdvice:          'stylistRequest',
+    currentRole:          'role',
+    platforms:            'platform',
+    topics:               'interestedTopic',
+    favoriteShows:        'favoriteThings',
+    referralSource:       'whereToHear',
+    styleProfile:         'customerPersona',
+    fitProblems:          'otherBodyTypeAndFitPreferenceSelection',
+    photoUploads:         'photos',
+    lifestyle:            'signUpPurpose',
+    stylePreferenceGates: 'stylePreferenceFlow',
+  };
+  for (const [from, to] of Object.entries(RENAMES)) {
+    if (p[from] !== undefined) { p[to] = p[from]; delete p[from]; }
+  }
+
+  // ── DOB string → birthdayMonth / birthdayDate / birthdayYear ───────────────
+  if (p.dob) {
+    const d = new Date(p.dob);
+    if (!isNaN(d.getTime())) {
+      p.birthdayMonth = String(d.getUTCMonth() + 1);
+      p.birthdayDate  = String(d.getUTCDate());
+      p.birthdayYear  = String(d.getUTCFullYear());
+    }
+    delete p.dob;
+  }
+
+  // ── socialMediaHandles array → socialMedia1 / socialMedia2 / socialMedia3 ──
+  if (p.socialMediaHandles !== undefined) {
+    const handles = Array.isArray(p.socialMediaHandles)
+      ? p.socialMediaHandles
+      : [p.socialMediaHandles];
+    p.socialMedia1 = handles[0] ?? null;
+    p.socialMedia2 = handles[1] ?? null;
+    p.socialMedia3 = handles[2] ?? null;
+    delete p.socialMediaHandles;
+  }
+
+  // ── topBrand: build from currentTopSize + currentTopSizeSecondary ───────────
+  if (!p.topBrand || typeof p.topBrand !== 'object') p.topBrand = {};
+  if (p.currentTopSize && !p.topBrand.primarySize) {
+    p.topBrand.primarySize = p.currentTopSize;
+  }
+  if (p.currentTopSizeSecondary) {
+    p.topBrand.secondarySize = p.currentTopSizeSecondary;
+    p.topBrand.isBetweenSize = true;
+    delete p.currentTopSizeSecondary;
+  } else if (p.topBrand.primarySize && p.topBrand.isBetweenSize === undefined) {
+    p.topBrand.isBetweenSize = false;
+  }
+
+  return p;
+}
+
 function buildPayload(profile, isComplete = false) {
-  return { stylingQuizJSON: { isComplete, ...profile } };
+  return { stylingQuizJSON: { isComplete, ...translateProfile(profile) } };
 }
 
 // ─── Core agentic loop ────────────────────────────────────────────────────────
