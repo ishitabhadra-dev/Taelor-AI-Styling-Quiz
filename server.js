@@ -865,7 +865,7 @@ async function runTurn(session, userMessage) {
   }
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-1.5-flash',
     systemInstruction: SYSTEM_PROMPT,
     tools: [{ functionDeclarations: geminiTools }],
     generationConfig: { maxOutputTokens: 512 }
@@ -875,8 +875,12 @@ async function runTurn(session, userMessage) {
 
   while (true) {
     const result = await model.generateContent({ contents: session.messages });
-    const candidate = result.response.candidates[0];
-    const parts = candidate.content.parts || [];
+    const candidate = result.response.candidates?.[0];
+    if (!candidate) {
+      console.error('[GEMINI] No candidates returned. promptFeedback:', JSON.stringify(result.response.promptFeedback));
+      return { type: 'message', text: "Let me think about that for a second — could you say that again?" };
+    }
+    const parts = candidate.content?.parts || [];
 
     // Store model response in history
     session.messages.push({ role: 'model', parts });
