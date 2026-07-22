@@ -865,7 +865,7 @@ async function runTurn(session, userMessage) {
   }
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: SYSTEM_PROMPT,
     tools: [{ functionDeclarations: geminiTools }],
     generationConfig: { maxOutputTokens: 512 }
@@ -1105,7 +1105,9 @@ app.post('/api/chat', async (req, res) => {
     sanitizeResult(result);
     res.json({ ...result, profile: buildPayload(session.profile) });
   } catch (err) {
-    console.error(err);
+    console.error('[API/CHAT ERROR]', err?.message || err);
+    if (err?.status) console.error('[API/CHAT ERROR] HTTP status:', err.status);
+    if (err?.errorDetails) console.error('[API/CHAT ERROR] details:', JSON.stringify(err.errorDetails));
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 });
