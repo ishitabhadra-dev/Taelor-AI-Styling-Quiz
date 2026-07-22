@@ -634,8 +634,8 @@ const geminiTools = [
     parameters: {
       type: 'object',
       properties: {
-        title:    { type: 'string', description: 'e.g. "Step 1 of 3"' },
-        subtitle: { type: 'string', description: 'e.g. "Let\'s cover the basics."' }
+        title:    { type: 'string', description: 'Short transition label e.g. "Now for sizing" or "One more thing"' },
+        subtitle: { type: 'string', description: 'One-line context e.g. "This helps us pull the right cuts."' }
       },
       required: ['title', 'subtitle']
     }

@@ -1562,12 +1562,21 @@ messagesEl.appendChild(wrap);
 
     let selectedOpt = null;
 
+    // SVG shirt silhouettes for fit visualization
+    const FIT_SVGS = {
+      'Slim':    `<svg viewBox="0 0 60 72" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 4 L10 14 L4 12 L4 28 L12 28 L12 68 L48 68 L48 28 L56 28 L56 12 L50 14 L40 4 Q35 8 30 8 Q25 8 20 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+      'Regular': `<svg viewBox="0 0 60 72" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 4 L6 16 L2 14 L2 30 L12 30 L12 68 L48 68 L48 30 L58 30 L58 14 L54 16 L42 4 Q36 9 30 9 Q24 9 18 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+      'Relaxed': `<svg viewBox="0 0 60 72" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 4 L2 18 L0 16 L0 34 L12 32 L14 68 L46 68 L48 32 L60 34 L60 16 L58 18 L44 4 Q37 10 30 10 Q23 10 16 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+    };
+
     widget.options.forEach((opt, i) => {
       const desc = widget.descriptions?.[i] || '';
+      const svg = FIT_SVGS[opt] || '';
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
+      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
       card.innerHTML = `
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px;">${opt}</div>
+        <div style="color:#B8844A;margin-bottom:6px;">${svg}</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${opt}</div>
         <div style="font-size:11px;color:#888;line-height:1.4;">${desc}</div>
       `;
       card.addEventListener('click', () => {
@@ -1678,7 +1687,34 @@ messagesEl.appendChild(wrap);
     errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-bottom:8px;display:none;';
 
     makeSizingSection(wrap, 'Top Size *');
-    makePillRow(wrap, ['XS','S','M','L','XL','XXL','In between'], v => { topSize = v; }, false, [], errEl);
+
+    // In-between secondary panel (hidden until "In between" selected)
+    const inBetweenPanel = document.createElement('div');
+    inBetweenPanel.style.cssText = 'display:none;margin-top:8px;padding:10px 12px;background:#faf7f3;border-radius:10px;border:1px solid #e8e0d5;';
+    inBetweenPanel.innerHTML = '<div style="font-size:11px;color:#888;margin-bottom:8px;">Which two sizes do you fall between?</div>';
+    const inBetweenRow = document.createElement('div');
+    inBetweenRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+    let activeIB = null;
+    ['XS–S','S–M','M–L','L–XL','XL–XXL'].forEach(pair => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:100px;font-size:12px;cursor:pointer;background:#fff;touch-action:manipulation;';
+      btn.textContent = pair;
+      btn.addEventListener('click', () => {
+        if (activeIB) { activeIB.style.borderColor='#e2e8f0'; activeIB.style.background='#fff'; activeIB.style.color=''; }
+        btn.style.borderColor='#B8844A'; btn.style.background='#B8844A'; btn.style.color='#fff';
+        activeIB = btn;
+        topSize = pair;
+      });
+      inBetweenRow.appendChild(btn);
+    });
+    inBetweenPanel.appendChild(inBetweenRow);
+
+    makePillRow(wrap, ['XS','S','M','L','XL','XXL','In between'], v => {
+      topSize = v;
+      inBetweenPanel.style.display = v === 'In between' ? 'block' : 'none';
+      if (v !== 'In between' && activeIB) { activeIB.style.borderColor='#e2e8f0'; activeIB.style.background='#fff'; activeIB.style.color=''; activeIB = null; }
+    }, false, [], errEl);
+    wrap.appendChild(inBetweenPanel);
 
     makeSizingSection(wrap, 'Top Fit *');
     makePillRow(wrap, ['Slim','Regular','Relaxed'], v => { topFit = v; }, true,
@@ -1805,9 +1841,8 @@ messagesEl.appendChild(wrap);
     const card = document.createElement('div');
     card.style.cssText = 'background:linear-gradient(135deg,#2C2118 0%,#3D2F22 100%);color:#FAF7F3;border-radius:16px;padding:18px 22px;margin:6px 0;box-shadow:0 4px 20px rgba(28,24,20,0.20);';
     card.innerHTML = `
-      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.45;margin-bottom:6px;font-weight:600;font-family:'Inter',sans-serif;">Taelor Style Quiz</div>
-      <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:600;margin-bottom:4px;letter-spacing:-0.02em;">${title}</div>
-      <div style="font-size:13px;opacity:0.65;line-height:1.4;font-family:'Inter',sans-serif;">${subtitle}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:600;margin-bottom:4px;letter-spacing:-0.02em;">${title}</div>
+      <div style="font-size:13px;opacity:0.7;line-height:1.4;font-family:'Inter',sans-serif;">${subtitle}</div>
     `;
     outer.appendChild(card);
     messagesEl.appendChild(outer);
@@ -2628,19 +2663,41 @@ messagesEl.appendChild(wrap);
 
     const tip = document.createElement('div');
     tip.className = 'widget-tip';
-    tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>To make sure your style is right for your age. We might even send you a birthday gift!</span>';
+    tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>Helps us style for your age — and we might send a birthday surprise!</span>';
     wrap.appendChild(tip);
 
-    const input = document.createElement('input');
-    input.type = 'date';
-    input.className = 'dob-input year'; // reuse styling
-    input.style.width = '180px';
-    input.style.fontSize = '15px';
-    input.style.padding = '10px 14px';
-    const today = new Date().toISOString().split('T')[0];
-    input.max = today;
-    input.min = '1920-01-01';
-    wrap.appendChild(input);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px;';
+
+    // Year selector (required)
+    const yearSel = document.createElement('select');
+    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:100px;';
+    const yearOpt0 = document.createElement('option');
+    yearOpt0.value = ''; yearOpt0.textContent = 'Birth year';
+    yearSel.appendChild(yearOpt0);
+    const curYear = new Date().getFullYear();
+    for (let y = curYear - 18; y >= 1930; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      yearSel.appendChild(o);
+    }
+
+    // Month selector (optional)
+    const monthSel = document.createElement('select');
+    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:120px;';
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthOpt0 = document.createElement('option');
+    monthOpt0.value = ''; monthOpt0.textContent = 'Month (optional)';
+    monthSel.appendChild(monthOpt0);
+    months.forEach((m, i) => {
+      const o = document.createElement('option');
+      o.value = String(i + 1).padStart(2, '0'); o.textContent = m;
+      monthSel.appendChild(o);
+    });
+
+    row.appendChild(yearSel);
+    row.appendChild(monthSel);
+    wrap.appendChild(row);
 
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
@@ -2649,13 +2706,15 @@ messagesEl.appendChild(wrap);
     btn.style.marginTop = '12px';
     btn.style.display = 'block';
 
-    input.addEventListener('change', () => { btn.disabled = !input.value; });
+    yearSel.addEventListener('change', () => { btn.disabled = !yearSel.value; });
 
     btn.addEventListener('click', async () => {
-      const [y, m, d] = input.value.split('-');
-      const formatted = `${m}/${d}/${y}`;
+      const year = yearSel.value;
+      const month = monthSel.value;
+      const formatted = month ? `${month}/01/${year}` : `01/01/${year}`;
+      const display = month ? `${months[parseInt(month)-1]} ${year}` : year;
       outer.remove();
-      addMessage(formatted, 'user');
+      addMessage(display, 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: formatted, tool_use_id: widget.tool_use_id });
     });
