@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
 const fs = require('fs');
 
 // ─── Validate required environment ───────────────────────────────────────────
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error('[FATAL] ANTHROPIC_API_KEY is not set. Copy .env.example → .env and add your key.');
+if (!process.env.GEMINI_API_KEY) {
+  console.error('[FATAL] GEMINI_API_KEY is not set. Copy .env.example → .env and add your key.');
   process.exit(1);
 }
 
@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // ─── Session storage ──────────────────────────────────────────────────────────
 // Uses Upstash REST API directly (no package) when env vars present.
@@ -279,8 +279,8 @@ const PROMPT_LEAK_PATTERNS = [
   /my\s+(instructions?|prompt|guidelines?|system\s+message|directives?)\b/i,
   /i\s+(was\s+)?instructed\s+to\b/i,
   /i\s+(was\s+)?told\s+to\b/i,
-  /\banthrop[io]c\b/i,
-  /\bclaude[\s-]*(haiku|sonnet|opus|3|ai)\b/i,
+  /\bgoogle\s+gemini\b/i,
+  /\bgemini[\s-]*(flash|pro|ultra|1\.5|2\.0|2\.5)\b/i,
   /as\s+an?\s+(ai|language\s+model|llm)\b/i,
   /my\s+training\b/i,
   /\btoken(s)?\b/i,
@@ -597,15 +597,16 @@ Then call finish_quiz with a closing message that references something specific 
 
 // ─── Tools ────────────────────────────────────────────────────────────────────
 
-const tools = [
+// Gemini FunctionDeclarations (same logic as before, just `parameters` instead of `input_schema`)
+const geminiTools = [
   {
     name: 'update_profile',
-    description: 'Save a collected answer to the style profile. Call after EVERY user answer. Use dot-paths for nested fields (e.g. "bottomBrand.primaryWaist").',
-    input_schema: {
+    description: 'Save a collected answer to the style profile. Call after EVERY user answer. Use dot-paths for nested fields (e.g. "bottomBrand.primaryWaist"). For array values, pass as a JSON-encoded string.',
+    parameters: {
       type: 'object',
       properties: {
         field: { type: 'string', description: 'Field name or dot-path' },
-        value: { description: 'Value — string, number, or array' }
+        value: { type: 'string', description: 'Value — string, number, or JSON-encoded array' }
       },
       required: ['field', 'value']
     }
@@ -613,7 +614,7 @@ const tools = [
   {
     name: 'present_options',
     description: 'Show clickable choice chips or visual cards. Use for ALL multiple-choice questions — never list options as plain text. Pass descriptions[] for card layout (topFit, pantFit). Pass is_required=true for required fields. Pass other_placeholder for steps that allow a free-text "other" response.',
-    input_schema: {
+    parameters: {
       type: 'object',
       properties: {
         question:          { type: 'string' },
@@ -629,8 +630,8 @@ const tools = [
   },
   {
     name: 'present_section_header',
-    description: 'Render a section divider card in the chat. Call before the first question of each new section (Step 1, Step 2, Step 3).',
-    input_schema: {
+    description: 'Render a section divider card in the chat. Call before the first question of each new section.',
+    parameters: {
       type: 'object',
       properties: {
         title:    { type: 'string', description: 'e.g. "Step 1 of 3"' },
@@ -641,11 +642,11 @@ const tools = [
   },
   {
     name: 'present_images',
-    description: 'Show a round of 4 outfit photos for the user to pick from. Supports multi-select — user can pick one or more. Use for the lookPreference rounds.',
-    input_schema: {
+    description: 'Show a round of 4 outfit photos for the user to pick from. Supports multi-select. Use for lookPreference rounds.',
+    parameters: {
       type: 'object',
       properties: {
-        question: { type: 'string', description: 'Question to display (e.g. "Round 1 of 8 — which outfit speaks to you?")' },
+        question: { type: 'string' },
         round:    { type: 'number', description: 'Round number 1–8' },
         field:    { type: 'string', description: 'Field to store selection (e.g. "lookPreference.round1")' }
       },
@@ -655,13 +656,13 @@ const tools = [
   {
     name: 'present_colors',
     description: 'Show all color swatches for the user to mark as Prefer or Avoid. Use for top and pant color steps.',
-    input_schema: {
+    parameters: {
       type: 'object',
       properties: {
-        question:     { type: 'string', description: 'Question to display' },
+        question:     { type: 'string' },
         garment:      { type: 'string', description: '"tops" or "pants"' },
-        field_prefer: { type: 'string', description: 'Profile field for preferred colors (e.g. "topColorPrefer")' },
-        field_avoid:  { type: 'string', description: 'Profile field for avoided colors (e.g. "topColorDislike")' }
+        field_prefer: { type: 'string' },
+        field_avoid:  { type: 'string' }
       },
       required: ['question', 'garment', 'field_prefer', 'field_avoid']
     }
@@ -669,12 +670,12 @@ const tools = [
   {
     name: 'present_prints',
     description: 'Show print pattern swatches for the user to mark as Prefer or Avoid. Use for the printPreference step.',
-    input_schema: {
+    parameters: {
       type: 'object',
       properties: {
-        question:     { type: 'string', description: 'Question to display' },
-        field_prefer: { type: 'string', description: 'Profile field for preferred prints (e.g. "printPrefer")' },
-        field_avoid:  { type: 'string', description: 'Profile field for avoided prints (e.g. "printAvoid")' }
+        question:     { type: 'string' },
+        field_prefer: { type: 'string' },
+        field_avoid:  { type: 'string' }
       },
       required: ['question', 'field_prefer', 'field_avoid']
     }
@@ -682,56 +683,36 @@ const tools = [
   {
     name: 'present_photo_upload',
     description: 'Show a photo upload widget so the user can share style photos. Use for the photoUploads step.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_social_handles',
-    description: 'Show three handle input boxes (#1, #2, #3) for social media handles or URLs. Use for the socialMediaHandles step.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show three handle input boxes for social media handles or URLs.',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_pant_size_picker',
-    description: 'Show a combined waist (W) + inseam (L) size picker for pants. Use for the bottomBrand step.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show a combined waist (W) + inseam (L) size picker for pants.',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_top_sizing',
-    description: 'Show a top sizing screen that collects top size (XS–XXL) and top fit (Slim/Regular/Relaxed). Use for step 4a.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show a top sizing screen that collects top size (XS–XXL) and top fit (Slim/Regular/Relaxed).',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_bottom_sizing',
-    description: 'Show a bottom sizing screen that collects pant waist (W), pant inseam (L), and pant fit (Skinny/Slim/Straight/Relaxed). Use for step 4b.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show a bottom sizing screen that collects pant waist (W), pant inseam (L), and pant fit.',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_brand_search',
-    description: 'Show a brand search widget where users can pick from popular brands or search/type any brand name. Use for the favoriteBrands step.',
-    input_schema: {
+    description: 'Show a brand search widget where users can pick from popular brands or type any brand name.',
+    parameters: {
       type: 'object',
       properties: {
         question: { type: 'string' },
-        field: { type: 'string', description: 'Profile field to store selected brands (e.g. "favoriteBrands")' }
+        field:    { type: 'string', description: 'Profile field to store selected brands (e.g. "favoriteBrands")' }
       },
       required: ['question', 'field']
     }
@@ -739,10 +720,10 @@ const tools = [
   {
     name: 'request_human_handoff',
     description: 'Call when the user is clearly frustrated, confused, or asks to speak to a real person/stylist.',
-    input_schema: {
+    parameters: {
       type: 'object',
       properties: {
-        reason:  { type: 'string', description: 'Brief reason for the handoff' },
+        reason:  { type: 'string' },
         message: { type: 'string', description: 'Empathetic message to show the user before handoff' }
       },
       required: ['reason', 'message']
@@ -750,30 +731,20 @@ const tools = [
   },
   {
     name: 'present_date_picker',
-    description: 'Show a calendar date picker widget for collecting date of birth. Use for the dob step.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show a calendar date picker widget for collecting date of birth.',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'present_height_picker',
-    description: 'Show a height selector (feet + inches buttons) for collecting height. Use for the heightFt/heightIn step.',
-    input_schema: {
-      type: 'object',
-      properties: { question: { type: 'string' } },
-      required: ['question']
-    }
+    description: 'Show a height selector (feet + inches buttons) for collecting height.',
+    parameters: { type: 'object', properties: { question: { type: 'string' } }, required: ['question'] }
   },
   {
     name: 'finish_quiz',
     description: 'Call when ALL profile fields have been collected.',
-    input_schema: {
+    parameters: {
       type: 'object',
-      properties: {
-        closing_message: { type: 'string' }
-      },
+      properties: { closing_message: { type: 'string' } },
       required: ['closing_message']
     }
   }
@@ -870,219 +841,234 @@ function buildPayload(profile, isComplete = false) {
   return { stylingQuizJSON: { isComplete, ...translateProfile(profile) } };
 }
 
-// ─── Core agentic loop ────────────────────────────────────────────────────────
+// ─── Core agentic loop (Gemini) ───────────────────────────────────────────────
 
 async function runTurn(session, userMessage) {
   // ── Heal broken history ──────────────────────────────────────────────────
-  // If the last saved assistant message contains tool_use blocks but has no
-  // matching tool_result in the next user message (e.g. server restarted while
-  // a widget was on screen), the Anthropic API will reject the request.
-  // Strip the dangling assistant turn so we resume from a clean state.
+  // If the last model turn contains functionCall parts but no matching
+  // functionResponse user turn yet (e.g. server restarted mid-widget),
+  // strip it so we resume from a clean state.
   const last = session.messages[session.messages.length - 1];
-  if (last?.role === 'assistant' && Array.isArray(last.content)) {
-    const hasUnresolvedToolUse = last.content.some(b => b.type === 'tool_use');
-    if (hasUnresolvedToolUse) {
+  if (last?.role === 'model' && Array.isArray(last.parts)) {
+    const hasUnresolvedFnCall = last.parts.some(p => p.functionCall);
+    if (hasUnresolvedFnCall) {
       session.messages.pop();
       session.pendingToolResults = [];
-      console.log('[SESSION] Removed dangling tool_use from message history on resume.');
+      console.log('[SESSION] Removed dangling functionCall from message history on resume.');
     }
   }
 
   if (userMessage) {
-    session.messages.push({ role: 'user', content: userMessage });
+    session.messages.push({ role: 'user', parts: [{ text: userMessage }] });
   } else if (session.messages.length === 0) {
-    session.messages.push({ role: 'user', content: "Hello, let's start the style quiz." });
+    session.messages.push({ role: 'user', parts: [{ text: "Hello, let's start the style quiz." }] });
   }
+
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.0-flash',
+    systemInstruction: SYSTEM_PROMPT,
+    tools: [{ functionDeclarations: geminiTools }],
+    generationConfig: { maxOutputTokens: 512 }
+  });
 
   let nudges = 0; // guard against infinite nudge loops
 
   while (true) {
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      system: SYSTEM_PROMPT,
-      tools,
-      messages: session.messages
-    });
+    const result = await model.generateContent({ contents: session.messages });
+    const candidate = result.response.candidates[0];
+    const parts = candidate.content.parts || [];
 
-    session.messages.push({ role: 'assistant', content: response.content });
+    // Store model response in history
+    session.messages.push({ role: 'model', parts });
 
-    if (response.stop_reason === 'end_turn') {
-      const text = (response.content.find(b => b.type === 'text')?.text || '').trim();
-      if (!text && nudges < 2) {
-        // Claude returned empty text (e.g. after processing present_section_header it went silent).
-        // Nudge it to continue rather than returning a blank message to the client.
+    const functionCalls = parts.filter(p => p.functionCall);
+    const textContent = parts.filter(p => p.text).map(p => p.text).join('').trim();
+
+    if (functionCalls.length === 0) {
+      // End of turn — no function calls
+      if (!textContent && nudges < 2) {
         nudges++;
-        console.log(`[TURN] Empty end_turn — nudging Claude to continue (attempt ${nudges})`);
-        session.messages.push({ role: 'user', content: 'Please continue.' });
+        console.log(`[TURN] Empty response — nudging model to continue (attempt ${nudges})`);
+        session.messages.push({ role: 'user', parts: [{ text: 'Please continue.' }] });
         continue;
       }
-      return { type: 'message', text };
+      return { type: 'message', text: textContent };
     }
 
-    if (response.stop_reason === 'tool_use') {
-      const toolResults = [];
-      let widgetToRender = null;
-      let textBeforeWidget = null;
+    // ── Process function calls ────────────────────────────────────────────
+    const fnResponses = []; // accumulated functionResponse parts for this turn
+    let widgetToRender = null;
+    let textBeforeWidget = textContent || null;
 
-      for (const block of response.content) {
-        if (block.type === 'text' && block.text) textBeforeWidget = block.text;
+    for (const part of functionCalls) {
+      const { name, args } = part.functionCall;
 
-        if (block.type === 'tool_use') {
-          if (block.name === 'update_profile') {
-            setNestedField(session.profile, block.input.field, block.input.value);
-            toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Profile updated.' });
-
-          } else if (block.name === 'present_section_header') {
-            // Continue the loop server-side — don't return early and force a second HTTP request.
-            // Store the header info and attach it to the next widget/message response.
-            toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Section header shown.' });
-            session._pendingSectionHeader = { title: block.input.title, subtitle: block.input.subtitle };
-
-          } else if (block.name === 'present_options') {
-            const hasDescriptions = Array.isArray(block.input.descriptions) && block.input.descriptions.length > 0;
-            widgetToRender = {
-              widgetType: hasDescriptions ? 'fit_cards' : 'chips',
-              question: block.input.question,
-              options: block.input.options,
-              descriptions: block.input.descriptions || [],
-              select_type: block.input.select_type,
-              field: block.input.field,
-              is_required: !!block.input.is_required,
-              other_placeholder: block.input.other_placeholder || null,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_images') {
-            const round = block.input.round;
-            const outfits = OUTFIT_ROUNDS[Math.min(round - 1, OUTFIT_ROUNDS.length - 1)];
-            widgetToRender = {
-              widgetType: 'images',
-              question: block.input.question,
-              outfits,
-              round,
-              totalRounds: OUTFIT_ROUNDS.length,
-              field: block.input.field,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_colors') {
-            widgetToRender = {
-              widgetType: 'colors',
-              question: block.input.question,
-              garment: block.input.garment,
-              field_prefer: block.input.field_prefer,
-              field_avoid: block.input.field_avoid,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_prints') {
-            widgetToRender = {
-              widgetType: 'prints',
-              question: block.input.question,
-              field_prefer: block.input.field_prefer,
-              field_avoid: block.input.field_avoid,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_photo_upload') {
-            widgetToRender = {
-              widgetType: 'photo_upload',
-              question: block.input.question,
-              field: 'photoUploads',
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_social_handles') {
-            widgetToRender = {
-              widgetType: 'social_handles',
-              question: block.input.question,
-              field: 'socialMediaHandles',
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_pant_size_picker') {
-            widgetToRender = {
-              widgetType: 'pant_size',
-              question: block.input.question,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_top_sizing') {
-            widgetToRender = {
-              widgetType: 'top_sizing',
-              question: block.input.question,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_bottom_sizing') {
-            widgetToRender = {
-              widgetType: 'bottom_sizing',
-              question: block.input.question,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_brand_search') {
-            widgetToRender = {
-              widgetType: 'brand_search',
-              question: block.input.question,
-              field: block.input.field,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'request_human_handoff') {
-            toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Handoff initiated.' });
-            session.messages.push({ role: 'user', content: toolResults });
-            return { type: 'handoff', text: block.input.message, reason: block.input.reason };
-
-          } else if (block.name === 'present_date_picker') {
-            widgetToRender = {
-              widgetType: 'date',
-              question: block.input.question,
-              field: 'dob',
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'present_height_picker') {
-            widgetToRender = {
-              widgetType: 'height',
-              question: block.input.question,
-              tool_use_id: block.id
-            };
-            break;
-
-          } else if (block.name === 'finish_quiz') {
-            toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: 'Quiz complete.' });
-            session.messages.push({ role: 'user', content: toolResults });
-            return { type: 'finished', text: block.input.closing_message };
-          }
+      if (name === 'update_profile') {
+        // args.value may be JSON-encoded array — try to parse
+        let val = args.value;
+        if (typeof val === 'string') {
+          try { const parsed = JSON.parse(val); if (Array.isArray(parsed)) val = parsed; } catch (_) {}
         }
-      }
+        setNestedField(session.profile, args.field, val);
+        fnResponses.push({ functionResponse: { name, response: { result: 'Profile updated.' } } });
 
-      if (widgetToRender) {
-        // Don't push partial toolResults as a user message here — the widget tool_use
-        // has no tool_result yet, so pushing now would create an incomplete user turn.
-        // Instead, stash any prior tool_results (e.g. from update_profile calls that
-        // ran before the widget) so /api/widget-response can merge them in.
-        session.pendingToolResults = toolResults;
-        const sectionHeader = session._pendingSectionHeader || null;
-        delete session._pendingSectionHeader;
-        return { type: 'widget', text: textBeforeWidget, widget: widgetToRender, sectionHeader };
-      }
+      } else if (name === 'present_section_header') {
+        fnResponses.push({ functionResponse: { name, response: { result: 'Section header shown.' } } });
+        session._pendingSectionHeader = { title: args.title, subtitle: args.subtitle };
 
-      session.messages.push({ role: 'user', content: toolResults });
+      } else if (name === 'present_options') {
+        const hasDescriptions = Array.isArray(args.descriptions) && args.descriptions.length > 0;
+        widgetToRender = {
+          widgetType: hasDescriptions ? 'fit_cards' : 'chips',
+          question: args.question,
+          options: args.options,
+          descriptions: args.descriptions || [],
+          select_type: args.select_type,
+          field: args.field,
+          is_required: !!args.is_required,
+          other_placeholder: args.other_placeholder || null,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_images') {
+        const round = Number(args.round);
+        const outfits = OUTFIT_ROUNDS[Math.min(round - 1, OUTFIT_ROUNDS.length - 1)];
+        widgetToRender = {
+          widgetType: 'images',
+          question: args.question,
+          outfits,
+          round,
+          totalRounds: OUTFIT_ROUNDS.length,
+          field: args.field,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_colors') {
+        widgetToRender = {
+          widgetType: 'colors',
+          question: args.question,
+          garment: args.garment,
+          field_prefer: args.field_prefer,
+          field_avoid: args.field_avoid,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_prints') {
+        widgetToRender = {
+          widgetType: 'prints',
+          question: args.question,
+          field_prefer: args.field_prefer,
+          field_avoid: args.field_avoid,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_photo_upload') {
+        widgetToRender = {
+          widgetType: 'photo_upload',
+          question: args.question,
+          field: 'photoUploads',
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_social_handles') {
+        widgetToRender = {
+          widgetType: 'social_handles',
+          question: args.question,
+          field: 'socialMediaHandles',
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_pant_size_picker') {
+        widgetToRender = {
+          widgetType: 'pant_size',
+          question: args.question,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_top_sizing') {
+        widgetToRender = {
+          widgetType: 'top_sizing',
+          question: args.question,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_bottom_sizing') {
+        widgetToRender = {
+          widgetType: 'bottom_sizing',
+          question: args.question,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_brand_search') {
+        widgetToRender = {
+          widgetType: 'brand_search',
+          question: args.question,
+          field: args.field,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'request_human_handoff') {
+        fnResponses.push({ functionResponse: { name, response: { result: 'Handoff initiated.' } } });
+        session.messages.push({ role: 'user', parts: fnResponses });
+        return { type: 'handoff', text: args.message, reason: args.reason };
+
+      } else if (name === 'present_date_picker') {
+        widgetToRender = {
+          widgetType: 'date',
+          question: args.question,
+          field: 'dob',
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'present_height_picker') {
+        widgetToRender = {
+          widgetType: 'height',
+          question: args.question,
+          tool_use_id: name
+        };
+        session._pendingWidgetName = name;
+        break;
+
+      } else if (name === 'finish_quiz') {
+        fnResponses.push({ functionResponse: { name, response: { result: 'Quiz complete.' } } });
+        session.messages.push({ role: 'user', parts: fnResponses });
+        return { type: 'finished', text: args.closing_message };
+      }
     }
+
+    if (widgetToRender) {
+      // Stash any fnResponses collected before the widget (e.g. update_profile)
+      // so widget-response can merge them into one complete user turn.
+      session.pendingToolResults = fnResponses;
+      const sectionHeader = session._pendingSectionHeader || null;
+      delete session._pendingSectionHeader;
+      return { type: 'widget', text: textBeforeWidget, widget: widgetToRender, sectionHeader };
+    }
+
+    // All function calls handled inline — send responses and continue the loop
+    session.messages.push({ role: 'user', parts: fnResponses });
   }
 }
 
@@ -1140,17 +1126,18 @@ app.post('/api/widget-response', async (req, res) => {
       ? value.join(', ')
       : String(value ?? '');
 
-  // Merge any tool_results that were stashed before the widget was returned
-  // (e.g. update_profile calls that ran in the same assistant turn as the widget tool_use).
-  // All tool_use blocks in an assistant turn must have matching tool_results in the
-  // immediately following user turn, so we combine them into a single content array.
+  // Merge any fnResponses stashed before the widget (e.g. update_profile calls
+  // that ran in the same model turn as the widget call). All functionCalls in a
+  // model turn must have matching functionResponses in one user turn.
   const pending = session.pendingToolResults || [];
+  const widgetName = session._pendingWidgetName || 'present_options';
   session.pendingToolResults = [];
+  delete session._pendingWidgetName;
   session.messages.push({
     role: 'user',
-    content: [
+    parts: [
       ...pending,
-      { type: 'tool_result', tool_use_id, content: selectionText || 'Selection saved.' }
+      { functionResponse: { name: widgetName, response: { result: selectionText || 'Selection saved.' } } }
     ]
   });
 
