@@ -6,25 +6,25 @@
   <title>Taelor — Style Profile</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* Taelor warm-neutral palette */
-      --color-bg:        #FAF7F3;   /* warm cream white — unified background */
-      --color-page:      #FAF7F3;   /* warm cream white — page background */
-      --color-text:      #1C1814;   /* warm charcoal — primary text */
-      --color-muted:     #8A7D74;   /* warm brown-gray — secondary text */
-      --color-border:    #D9D1C7;   /* warm beige — borders */
-      --color-soft:      #F2EDE6;   /* warm off-white — hover/input bg */
-      --color-accent:    #B8844A;   /* caramel — CTAs, selections, progress */
-      --color-accent-bg: #F5E9D6;   /* caramel tint — soft selected state */
-      --color-accent-dk: #9A6B35;   /* darker caramel — hover state */
-      --radius-md:       14px;
-      --radius-lg:       20px;
-      --shadow-card:     0 1px 3px rgba(28,24,20,0.06), 0 8px 24px rgba(28,24,20,0.06);
-      --shadow-widget:   0 1px 2px rgba(28,24,20,0.05);
-      --font:            'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-display:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Midnight Sartorial — Smart Way to Dress */
+      --color-bg:        #FAF7F3;   /* warm cream — keeps warmth against midnight blue */
+      --color-page:      #F5F2EE;   /* slightly deeper cream page */
+      --color-text:      #0a192f;   /* midnight blue — primary text */
+      --color-muted:     #5a7089;   /* muted slate — secondary text */
+      --color-border:    #dde3ea;   /* cool silver — borders */
+      --color-soft:      #f0f3f6;   /* cool off-white — hover/input bg */
+      --color-accent:    #0a192f;   /* midnight blue — CTAs, selections, progress */
+      --color-accent-bg: #e6edf5;   /* midnight tint — soft selected state */
+      --color-accent-dk: #061323;   /* deeper midnight — hover state */
+      --radius-md:       8px;       /* ROUND_EIGHT — sharp, structured */
+      --radius-lg:       12px;      /* cards and containers */
+      --shadow-card:     0 1px 3px rgba(10,25,47,0.08), 0 8px 24px rgba(10,25,47,0.06);
+      --shadow-widget:   0 1px 2px rgba(10,25,47,0.05);
+      --font:            'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-display:    'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
       --transition:      0.15s ease;
     }
 
@@ -123,7 +123,7 @@
       line-height: 1.4;
       margin-bottom: 4px;
       text-transform: uppercase;
-      color: #2C1F14;
+      color: var(--color-text);
     }
 
     #chat-intro p {
@@ -191,18 +191,19 @@
     }
 
     .bubble.ai {
-      background: #EDEAE4;
+      background: #ffffff;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: 2px;
       color: var(--color-text);
+      box-shadow: 0 1px 3px rgba(10,25,47,0.06);
     }
 
     .bubble.user {
-      background: #2C2118;
-      color: #FAF7F3;
+      background: #0a192f;
+      color: #f0f6ff;
       border-radius: var(--radius-md);
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: 2px;
     }
 
     /* ── Message timestamps (iMessage-style) ────────────────────────────────── */
@@ -221,12 +222,13 @@
       display: flex;
       gap: 5px;
       padding: 12px 16px;
-      background: #EDEAE4;
+      background: #ffffff;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: 2px;
       align-self: flex-start;
       width: fit-content;
+      box-shadow: 0 1px 3px rgba(10,25,47,0.06);
     }
 
     .typing-wrap span {
@@ -742,14 +744,14 @@
     .confirm-btn {
       padding: 11px 22px;
       background: var(--color-accent);
-      color: #fff;
+      color: #f0f6ff;
       border: none;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       font-size: 13.5px;
       font-weight: 600;
       font-family: var(--font);
       cursor: pointer;
-      letter-spacing: -0.01em;
+      letter-spacing: 0.02em;
       transition: opacity var(--transition), transform var(--transition);
     }
 
@@ -772,12 +774,12 @@
       flex: 1;
       padding: 10px 14px;
       border: 1.5px solid var(--color-border);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       font-size: 16px; /* 16px prevents iOS Safari from zooming on focus */
       font-family: var(--font);
       color: var(--color-text);
       outline: none;
-      background: var(--color-soft);
+      background: #ffffff;
       transition: border-color var(--transition), background var(--transition);
       min-height: 44px;
     }
@@ -789,14 +791,14 @@
     #send-btn {
       padding: 10px 18px;
       background: var(--color-accent);
-      color: #fff;
+      color: #f0f6ff;
       border: none;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       font-size: 13px;
       font-weight: 600;
       font-family: var(--font);
       cursor: pointer;
-      letter-spacing: -0.01em;
+      letter-spacing: 0.02em;
       transition: opacity var(--transition);
       white-space: nowrap;
       min-height: 44px;
@@ -1021,7 +1023,7 @@
   <div id="chat-card">
     <div id="chat-intro">
       <h2>Your style profile</h2>
-      <p>A few questions — about 5 minutes.</p>
+      <p>A few quick questions to get your profile set up.</p>
     </div>
     <div id="stylist-note">
       <span class="stylist-dot"></span>
@@ -1437,9 +1439,9 @@
     const LIFESTYLE_OPTIONS = [
       'Mostly in the office',
       'Working from home',
-      'Always on the move — lots of travel',
-      'Active lifestyle — gym & outdoors',
-      'Creative work — studio or agency',
+      'Always on the move, lots of travel',
+      'Active lifestyle, gym & outdoors',
+      'Creative work, studio or agency',
       'Mix of a few'
     ];
     const OCCASION_OPTIONS = [
@@ -1649,7 +1651,7 @@
     if (!widget.is_required) {
       const skipBtn = document.createElement('button');
       skipBtn.className = 'skip-btn';
-      skipBtn.textContent = 'Skip — I\'ll let my stylist decide';
+      skipBtn.textContent = 'Skip, let my stylist decide';
       skipBtn.addEventListener('click', async () => {
         const skipValue = widget.select_type === 'multi' ? [] : '';
         wrap.closest('.msg')?.remove() || wrap.remove();
@@ -2378,7 +2380,7 @@
 
     const skipColorBtn = document.createElement('button');
     skipColorBtn.className = 'skip-btn';
-    skipColorBtn.textContent = 'Skip — open to all colors';
+    skipColorBtn.textContent = 'Skip, open to all colors';
     skipColorBtn.addEventListener('click', async () => {
       outer.remove();
       addMessage('Open to all colors', 'user');
@@ -2485,7 +2487,7 @@
 
     const skipPrintBtn = document.createElement('button');
     skipPrintBtn.className = 'skip-btn';
-    skipPrintBtn.textContent = 'Skip — open to all prints';
+    skipPrintBtn.textContent = 'Skip, open to all prints';
     skipPrintBtn.addEventListener('click', async () => {
       outer.remove();
       addMessage('Open to all prints', 'user');
@@ -2633,7 +2635,7 @@
 
     const skipBtn = document.createElement('button');
     skipBtn.className = 'skip-btn';
-    skipBtn.textContent = 'Skip — stylist\'s choice';
+    skipBtn.textContent = 'Leave it to my stylist';
     skipBtn.addEventListener('click', async () => {
       outer.remove();
       addMessage('Open to anything', 'user');
@@ -3274,7 +3276,7 @@
     wrap.className = 'msg ai';
     const b = document.createElement('div');
     b.style.cssText = 'font-size:13px;color:#888;padding:8px 12px;background:#f7f7f5;border:1px solid #e5e5e5;border-radius:12px;display:flex;align-items:center;gap:8px;';
-    b.innerHTML = `<span style="font-size:16px;">⏳</span> Still thinking — thanks for your patience…`;
+    b.innerHTML = `<span style="font-size:16px;">⏳</span> Still thinking, thanks for your patience…`;
     wrap.appendChild(b);
     messagesEl.appendChild(wrap);
     scrollBottom();
