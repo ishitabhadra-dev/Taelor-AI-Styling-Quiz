@@ -514,14 +514,9 @@ QUIZ FLOW — 10 STEPS (~2 minutes)
 =======================================================================
 
 STEP 1 — LIFESTYLE + OCCASIONS (combined)
-On the first turn, say your 2-sentence opening, then immediately call present_options:
-  question="What does your typical week look like?"
-  options=["Mostly in the office","Working from home","Always on the move — lots of travel","Active lifestyle — gym & outdoors","Creative work — studio or agency","Mix of a few"]
-  select_type="single", field="lifestyle", is_required=true
-→ Immediately after saving lifestyle — NO bridge message, NO filler text — call present_options:
-  question="What are you mainly dressing for?"
-  options=["Work from home","Work from office","Business travel","Weekend","Date night","Vacation","Everyday casual","Athleisure"]
-  select_type="multi", field="occasions"
+On the first turn, say your 2-sentence opening, then call present_lifestyle_occasions.
+This shows both questions in one card — the user picks their lifestyle and occasions together and confirms once.
+Widget returns: lifestyle (required), occasions (optional array).
 
 STEP 2 — PHONE NUMBER
 Ask naturally — frame it as connecting them with their stylist, not filling out a form. Example:
@@ -603,6 +598,11 @@ Then call finish_quiz with a closing message that references something specific 
 
 // Gemini FunctionDeclarations (same logic as before, just `parameters` instead of `input_schema`)
 const geminiTools = [
+  {
+    name: 'present_lifestyle_occasions',
+    description: 'Show lifestyle + occasions as a single combined widget — two questions, one card, one confirm. Use ONLY for STEP 1. No parameters needed.',
+    parameters: { type: 'object', properties: {}, required: [] }
+  },
   {
     name: 'update_profile',
     description: 'Save a collected answer to the style profile. Call after EVERY user answer. Use dot-paths for nested fields (e.g. "bottomBrand.primaryWaist"). For array values, pass as a JSON-encoded string.',
@@ -934,6 +934,11 @@ async function runTurn(session, userMessage) {
         }
         setNestedField(session.profile, args.field, val);
         fnResponses.push({ functionResponse: { name, response: { result: 'Profile updated.' } } });
+
+      } else if (name === 'present_lifestyle_occasions') {
+        widgetToRender = { widgetType: 'lifestyle_occasions', tool_use_id: name };
+        session._pendingWidgetName = name;
+        break;
 
       } else if (name === 'present_section_header') {
         fnResponses.push({ functionResponse: { name, response: { result: 'Section header shown.' } } });

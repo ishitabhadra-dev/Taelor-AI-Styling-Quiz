@@ -1411,6 +1411,7 @@
     isWaitingForWidget = true;
     setInputDisabled(true);
     pendingWidgetQuestion = widget.question || '';
+    if (widget.widgetType === 'lifestyle_occasions') return renderLifestyleOccasions(widget);
     if (widget.widgetType === 'images')        return renderImageSelector(widget);
     if (widget.widgetType === 'colors')        return renderColorPicker(widget);
     if (widget.widgetType === 'prints')        return renderPrintsPicker(widget);
@@ -1429,6 +1430,115 @@
     console.warn('[widget] Unknown widgetType:', widget.widgetType, '— falling back to free-text');
     isWaitingForWidget = false;
     setInputDisabled(false);
+  }
+
+  // ── Lifestyle + Occasions (combined first step) ───────────────────────────
+  function renderLifestyleOccasions(widget) {
+    const LIFESTYLE_OPTIONS = [
+      'Mostly in the office',
+      'Working from home',
+      'Always on the move — lots of travel',
+      'Active lifestyle — gym & outdoors',
+      'Creative work — studio or agency',
+      'Mix of a few'
+    ];
+    const OCCASION_OPTIONS = [
+      'Work from home','Work from office','Business travel','Weekend',
+      'Date night','Vacation','Everyday casual','Athleisure'
+    ];
+
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    // — Section 1: Lifestyle —
+    const lbl1 = document.createElement('div');
+    lbl1.className = 'widget-label';
+    lbl1.innerHTML = 'What does your typical week look like?<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>';
+    wrap.appendChild(lbl1);
+
+    const chips1 = document.createElement('div');
+    chips1.className = 'chips';
+    let selectedLifestyle = null;
+
+    LIFESTYLE_OPTIONS.forEach(opt => {
+      const c = document.createElement('div');
+      c.className = 'chip';
+      c.textContent = opt;
+      c.addEventListener('click', () => {
+        chips1.querySelectorAll('.chip').forEach(x => x.classList.remove('selected'));
+        c.classList.add('selected');
+        selectedLifestyle = opt;
+        errEl.style.display = 'none';
+        confirmBtn.disabled = false;
+      });
+      chips1.appendChild(c);
+    });
+    wrap.appendChild(chips1);
+
+    // — Divider —
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height:1px;background:var(--color-border);margin:18px 0 14px;';
+    wrap.appendChild(divider);
+
+    // — Section 2: Occasions —
+    const lbl2 = document.createElement('div');
+    lbl2.className = 'widget-label';
+    lbl2.style.marginBottom = '10px';
+    lbl2.innerHTML = 'What are you mainly dressing for?<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>';
+    wrap.appendChild(lbl2);
+
+    const chips2 = document.createElement('div');
+    chips2.className = 'chips';
+    const selectedOccasions = new Set();
+
+    OCCASION_OPTIONS.forEach(opt => {
+      const c = document.createElement('div');
+      c.className = 'chip';
+      c.textContent = opt;
+      c.addEventListener('click', () => {
+        c.classList.toggle('selected');
+        selectedOccasions[c.classList.contains('selected') ? 'add' : 'delete'](opt);
+      });
+      chips2.appendChild(c);
+    });
+    wrap.appendChild(chips2);
+
+    // — Error + Confirm —
+    const errEl = document.createElement('div');
+    errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-top:8px;display:none;';
+    errEl.textContent = 'Please select your lifestyle to continue.';
+    wrap.appendChild(errEl);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm';
+    confirmBtn.style.marginTop = '14px';
+    confirmBtn.disabled = true;
+    confirmBtn.addEventListener('click', async () => {
+      if (!selectedLifestyle) {
+        errEl.style.display = 'block';
+        return;
+      }
+      const occasions = [...selectedOccasions];
+      const summary = occasions.length
+        ? `${selectedLifestyle} · ${occasions.join(', ')}`
+        : selectedLifestyle;
+      outer.remove();
+      addMessage(summary, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { lifestyle: selectedLifestyle, occasions },
+        value: summary,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(confirmBtn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
   }
 
   // ── Chips ────────────────────────────────────────────────────────────────
