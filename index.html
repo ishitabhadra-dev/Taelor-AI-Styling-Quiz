@@ -1414,6 +1414,7 @@
     if (widget.widgetType === 'images')        return renderImageSelector(widget);
     if (widget.widgetType === 'colors')        return renderColorPicker(widget);
     if (widget.widgetType === 'prints')        return renderPrintsPicker(widget);
+    if (widget.widgetType === 'colors_prints') return renderColorsPrints(widget);
     if (widget.widgetType === 'date')          return renderDatePicker(widget);
     if (widget.widgetType === 'height')        return renderHeightPicker(widget);
     if (widget.widgetType === 'pant_size')     return renderPantSizePicker(widget);
@@ -1423,8 +1424,6 @@
     if (widget.widgetType === 'fit_cards')     return renderFitCards(widget);
     if (widget.widgetType === 'top_sizing')    return renderTopSizing(widget);
     if (widget.widgetType === 'bottom_sizing') return renderBottomSizing(widget);
-    // Garment step: chips field is 'doNotWant' — render with images
-    if (widget.widgetType === 'chips' && widget.field === 'doNotWant') return renderGarmentGrid(widget);
     if (widget.widgetType === 'chips') return renderChips(widget);
     // Safety: unknown widget type — don't leave input locked
     console.warn('[widget] Unknown widgetType:', widget.widgetType, '— falling back to free-text');
@@ -2388,6 +2387,159 @@
       });
     });
     wrap.appendChild(skipPrintBtn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
+  // ── Combined Colors + Prints ──────────────────────────────────────────────
+  function renderColorsPrints(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
+    wrap.appendChild(lbl);
+
+    // ─ Colors section ─
+    const colorHead = document.createElement('div');
+    colorHead.style.cssText = 'font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#888;margin:10px 0 6px;';
+    colorHead.textContent = 'Colors';
+    wrap.appendChild(colorHead);
+
+    const colorHint = document.createElement('div');
+    colorHint.className = 'color-hint';
+    colorHint.innerHTML = `<span><span class="hint-dot prefer"></span> Prefer</span><span><span class="hint-dot avoid"></span> Avoid</span><span style="color:#bbb">Tap to cycle</span>`;
+    wrap.appendChild(colorHint);
+
+    const colorGrid = document.createElement('div');
+    colorGrid.className = 'color-grid';
+    const colorState = {};
+    COLORS.forEach(color => {
+      const item = document.createElement('div');
+      item.className = 'color-swatch';
+      const dot = document.createElement('div');
+      dot.className = 'swatch-dot';
+      dot.style.background = color.bg || color.hex;
+      if (color.border) dot.style.borderColor = '#d0d0d0';
+      const name = document.createElement('div');
+      name.className = 'swatch-name';
+      name.textContent = color.name;
+      colorState[color.name] = null;
+      item.addEventListener('click', () => {
+        const curr = colorState[color.name];
+        dot.classList.remove('prefer', 'avoid');
+        if (!curr) { colorState[color.name] = 'prefer'; dot.classList.add('prefer'); }
+        else if (curr === 'prefer') { colorState[color.name] = 'avoid'; dot.classList.add('avoid'); }
+        else { colorState[color.name] = null; }
+      });
+      item.appendChild(dot);
+      item.appendChild(name);
+      colorGrid.appendChild(item);
+    });
+    wrap.appendChild(colorGrid);
+
+    // ─ Divider ─
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height:1px;background:var(--color-border);margin:16px 0 10px;';
+    wrap.appendChild(divider);
+
+    // ─ Prints section ─
+    const printHead = document.createElement('div');
+    printHead.style.cssText = 'font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#888;margin-bottom:6px;';
+    printHead.textContent = 'Patterns & Prints';
+    wrap.appendChild(printHead);
+
+    const printHint = document.createElement('div');
+    printHint.className = 'prints-hint';
+    printHint.innerHTML = `<span><span class="hint-dot prefer"></span> Prefer</span><span><span class="hint-dot avoid"></span> Avoid</span><span style="color:#bbb">Tap to cycle</span>`;
+    wrap.appendChild(printHint);
+
+    const printGrid = document.createElement('div');
+    printGrid.className = 'prints-grid';
+    const printState = {};
+    PRINTS.forEach(print => {
+      const item = document.createElement('div');
+      item.className = 'print-item';
+      const swatch = document.createElement('div');
+      swatch.className = 'print-swatch';
+      swatch.style.background = print.bg;
+      if (print.border) swatch.style.border = '1.5px solid #ddd';
+      if (print.text) { swatch.textContent = print.text; swatch.style.color = print.textColor || '#333'; swatch.style.fontSize = '18px'; swatch.style.fontWeight = '700'; }
+      const label = document.createElement('div');
+      label.className = 'print-label';
+      label.textContent = print.name;
+      printState[print.name] = null;
+      item.addEventListener('click', () => {
+        const curr = printState[print.name];
+        item.classList.remove('prefer', 'avoid');
+        if (!curr) { printState[print.name] = 'prefer'; item.classList.add('prefer'); }
+        else if (curr === 'prefer') { printState[print.name] = 'avoid'; item.classList.add('avoid'); }
+        else { printState[print.name] = null; }
+        label.textContent = print.name;
+      });
+      item.appendChild(swatch);
+      item.appendChild(label);
+      printGrid.appendChild(item);
+    });
+    wrap.appendChild(printGrid);
+
+    // ─ Buttons ─
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'confirm-btn';
+    saveBtn.style.marginTop = '14px';
+    saveBtn.textContent = 'Save preferences';
+    saveBtn.addEventListener('click', async () => {
+      const colorPrefer = Object.entries(colorState).filter(([,v]) => v === 'prefer').map(([k]) => k);
+      const colorAvoid  = Object.entries(colorState).filter(([,v]) => v === 'avoid').map(([k]) => k);
+      const printPrefer = Object.entries(printState).filter(([,v]) => v === 'prefer').map(([k]) => k);
+      const printAvoid  = Object.entries(printState).filter(([,v]) => v === 'avoid').map(([k]) => k);
+      const parts = [];
+      if (colorPrefer.length) parts.push(`Colors I love: ${colorPrefer.join(', ')}`);
+      if (colorAvoid.length)  parts.push(`Avoid colors: ${colorAvoid.join(', ')}`);
+      if (printPrefer.length) parts.push(`Prints I like: ${printPrefer.join(', ')}`);
+      if (printAvoid.length)  parts.push(`Avoid prints: ${printAvoid.join(', ')}`);
+      const summary = parts.length ? parts.join(' · ') : 'Open to everything';
+      outer.remove();
+      addMessage(summary, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: {
+          [widget.field_color_prefer]: colorPrefer,
+          [widget.field_color_avoid]:  colorAvoid,
+          [widget.field_print_prefer]: printPrefer,
+          [widget.field_print_avoid]:  printAvoid
+        },
+        value: summary,
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(saveBtn);
+
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'Skip — stylist\'s choice';
+    skipBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Open to anything', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: {
+          [widget.field_color_prefer]: [],
+          [widget.field_color_avoid]:  [],
+          [widget.field_print_prefer]: [],
+          [widget.field_print_avoid]:  []
+        },
+        value: 'Open to anything',
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(skipBtn);
 
     outer.appendChild(wrap);
     messagesEl.appendChild(outer);
