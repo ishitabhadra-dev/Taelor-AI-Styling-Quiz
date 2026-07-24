@@ -6,7 +6,7 @@
   <title>Taelor — Style Profile</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       /* Taelor warm-neutral palette */
@@ -117,10 +117,12 @@
 
     #chat-intro h2 {
       font-family: var(--font);
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
       margin-bottom: 4px;
+      text-transform: uppercase;
     }
 
     #chat-intro p {
@@ -409,17 +411,25 @@
       font-size: 12px;
       color: var(--color-muted);
       cursor: pointer;
-      background: none;
-      border: none;
+      background: #f8f5f1;
+      border: 1.5px solid var(--color-border);
+      border-radius: 100px;
       font-family: var(--font);
-      padding: 0;
-      margin-bottom: 8px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
+      padding: 9px 18px;
+      margin-top: 8px;
+      margin-bottom: 4px;
       display: block;
+      width: 100%;
+      text-align: center;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      letter-spacing: 0.01em;
     }
 
-    .skip-btn:hover { color: var(--color-text); }
+    .skip-btn:hover {
+      color: var(--color-text);
+      border-color: #bbb;
+      background: #ede9e3;
+    }
 
     /* ── Tip text ────────────────────────────────────────────────────────── */
     .widget-tip {
@@ -1060,6 +1070,7 @@
   const sendBtn             = document.getElementById('send-btn');
 
   let isWaitingForWidget = false;
+  let pendingWidgetQuestion = ''; // tracks last widget question so it stays visible after submit
 
   // ── Field label map ────────────────────────────────────────────────────
   const FIELD_LABELS = {
@@ -1295,6 +1306,20 @@
 
   function addMessage(text, role) {
     if (!text) return;
+
+    // If replying to a widget, show the question as a small greyed label so it's
+    // still readable when scrolling back through the conversation.
+    if (role === 'user' && pendingWidgetQuestion) {
+      const qWrap = document.createElement('div');
+      qWrap.className = 'msg ai';
+      const qLabel = document.createElement('div');
+      qLabel.style.cssText = 'font-size:11.5px;color:#b0a898;padding:5px 12px;font-style:italic;background:#f5f2ee;border:1px solid #e8e3db;border-radius:10px;max-width:85%;';
+      qLabel.textContent = pendingWidgetQuestion;
+      qWrap.appendChild(qLabel);
+      messagesEl.appendChild(qWrap);
+      pendingWidgetQuestion = '';
+    }
+
     const wrap = document.createElement('div');
     wrap.className = `msg ${role}`;
     const b = document.createElement('div');
@@ -1384,6 +1409,7 @@
   function renderWidget(widget) {
     isWaitingForWidget = true;
     setInputDisabled(true);
+    pendingWidgetQuestion = widget.question || '';
     if (widget.widgetType === 'images')        return renderImageSelector(widget);
     if (widget.widgetType === 'colors')        return renderColorPicker(widget);
     if (widget.widgetType === 'prints')        return renderPrintsPicker(widget);
@@ -1413,9 +1439,9 @@
     const lbl = document.createElement('div');
     lbl.className = 'widget-label';
     if (widget.is_required) {
-      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;">*</span>`;
+      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>`;
     } else {
-      lbl.textContent = widget.question;
+      lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
     }
     wrap.appendChild(lbl);
     addTip(wrap, widget.field);
@@ -1512,8 +1538,8 @@
     // Skip button for optional questions
     if (!widget.is_required) {
       const skipBtn = document.createElement('button');
-      skipBtn.style.cssText = 'background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;padding:6px 0 2px;display:block;text-decoration:underline;';
-      skipBtn.textContent = 'Skip this question';
+      skipBtn.className = 'skip-btn';
+      skipBtn.textContent = 'Skip — I\'ll let my stylist decide';
       skipBtn.addEventListener('click', async () => {
         const skipValue = widget.select_type === 'multi' ? [] : '';
         wrap.closest('.msg')?.remove() || wrap.remove();
@@ -1539,9 +1565,9 @@
     const lbl = document.createElement('div');
     lbl.className = 'widget-label';
     if (widget.is_required) {
-      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;">*</span>`;
+      lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>`;
     } else {
-      lbl.textContent = widget.question;
+      lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
     }
     wrap.appendChild(lbl);
 
@@ -1555,31 +1581,69 @@
 
     let selectedOpt = null;
 
-    // SVG shirt silhouettes for fit visualization — filled, front-view
+    // SVG shirt illustrations — Taelor style (blue shirt, collar, orange side-seam stripe)
+    // Orange stripe width = visual indicator of how much room the fit has
     const FIT_SVGS = {
-      // Slim: narrow body (16px wide in 64px viewBox)
-      'Slim': `<svg viewBox="0 0 64 76" width="52" height="62" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M24 20 L24 72 L40 72 L40 20 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M24 20 L8 12 L5 34 L24 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M40 20 L56 12 L59 34 L40 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M28 20 L32 29 L36 20" fill="#BDD3ED" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M26 20 Q32 16 38 20" fill="none" stroke="#6A9FCC" stroke-width="1.5"/>
+      // Slim: narrow orange stripe (close to body)
+      'Slim': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hanger -->
+        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
+        <!-- Left sleeve -->
+        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Shirt body -->
+        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Collar stand/dark back -->
+        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
+        <!-- Collar left flap -->
+        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <!-- Collar right flap -->
+        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <!-- Button placket (dark center strip) -->
+        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
+        <!-- Shirt crease detail -->
+        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
+        <!-- SLIM: narrow orange stripe — close fit -->
+        <rect x="20" y="60" width="5" height="44" fill="#E8960A" rx="1"/>
+        <!-- Side seam line -->
+        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
+        <!-- Red arrow -->
+        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
       </svg>`,
-      // Regular: medium body (28px wide)
-      'Regular': `<svg viewBox="0 0 64 76" width="52" height="62" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 20 L18 72 L46 72 L46 20 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M18 20 L4 12 L1 34 L18 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M46 20 L60 12 L63 34 L46 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M24 20 L32 29 L40 20" fill="#BDD3ED" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M22 20 Q32 16 42 20" fill="none" stroke="#6A9FCC" stroke-width="1.5"/>
+      // Regular: medium orange stripe
+      'Regular': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
+        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
+        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
+        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
+        <!-- REGULAR: medium orange stripe -->
+        <rect x="13" y="60" width="12" height="44" fill="#E8960A" rx="1"/>
+        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
+        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
       </svg>`,
-      // Relaxed: wide body (40px wide)
-      'Relaxed': `<svg viewBox="0 0 64 76" width="52" height="62" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 20 L12 72 L52 72 L52 20 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M12 20 L0 10 L-2 34 L12 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M52 20 L64 10 L66 34 L52 32 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M20 20 L32 29 L44 20" fill="#BDD3ED" stroke="#6A9FCC" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M18 20 Q32 16 46 20" fill="none" stroke="#6A9FCC" stroke-width="1.5"/>
+      // Relaxed: wide orange stripe (lots of room)
+      'Relaxed': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
+        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
+        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
+        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
+        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
+        <!-- RELAXED: wide orange stripe — lots of room -->
+        <rect x="5" y="60" width="20" height="44" fill="#E8960A" rx="1"/>
+        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
+        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
       </svg>`,
     };
 
@@ -1587,7 +1651,7 @@
       const desc = widget.descriptions?.[i] || '';
       const svg = FIT_SVGS[opt] || '';
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
+      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px 12px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
       card.innerHTML = `
         <div style="color:#B8844A;margin-bottom:6px;">${svg}</div>
         <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${opt}</div>
@@ -1815,25 +1879,72 @@
 
     makeSizingSection(wrap, 'Pant Fit *');
     // Visual pant fit cards with SVG illustrations
+    // Taelor-style pant illustrations: left leg transparent (skin shows), right solid blue,
+    // red ↔ arrow at ankle shows leg opening width. Each fit has different ankle widths.
+    // Gradient IDs are unique per card to avoid SVG ID conflicts.
+    function makePantSVG(id, leftAnkleOuter, leftAnkleInner, rightAnkleInner, rightAnkleOuter) {
+      return `<svg viewBox="0 0 80 148" width="58" height="108" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sg${id}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#A8C8F0" stop-opacity="0.5"/>
+            <stop offset="30%" stop-color="#F5E0C8" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#EDD0A8"/>
+          </linearGradient>
+        </defs>
+        <!-- Torso above waistband -->
+        <rect x="16" y="0" width="48" height="14" rx="7" fill="#F2DEC8"/>
+        <!-- Waistband -->
+        <rect x="6" y="11" width="68" height="11" rx="1" fill="#2A4878" stroke="#1A3868" stroke-width="0.5"/>
+        <!-- Belt loops -->
+        <rect x="12" y="9" width="5" height="8" rx="1" fill="#1A3868"/>
+        <rect x="37" y="9" width="5" height="8" rx="1" fill="#1A3868"/>
+        <rect x="63" y="9" width="5" height="8" rx="1" fill="#1A3868"/>
+        <!-- Button -->
+        <circle cx="40" cy="16" r="2" fill="#6A9AC8" stroke="#1A3868" stroke-width="0.5"/>
+        <!-- Left pocket (dashed) -->
+        <rect x="8" y="22" width="22" height="13" rx="2" fill="none" stroke="#7AAAD8" stroke-width="0.8" stroke-dasharray="2,2"/>
+        <!-- Right pocket (dashed) -->
+        <rect x="50" y="22" width="22" height="13" rx="2" fill="none" stroke="#7AAAD8" stroke-width="0.8" stroke-dasharray="2,2"/>
+        <!-- Center fly seam -->
+        <line x1="40" y1="17" x2="40" y2="50" stroke="#1A3868" stroke-width="0.8" stroke-dasharray="2,2"/>
+        <!-- LEFT LEG — skin-tone transparent fill -->
+        <path d="M6 22 L36 22 L${leftAnkleInner} 126 L${leftAnkleOuter} 126 Z" fill="url(#sg${id})" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Left knee crease -->
+        <path d="M${leftAnkleOuter+2} 82 Q${(leftAnkleOuter+leftAnkleInner)/2} 86 ${leftAnkleInner-2} 82" fill="none" stroke="#C8A888" stroke-width="1"/>
+        <!-- LEFT FOOT -->
+        <ellipse cx="${(leftAnkleOuter+leftAnkleInner)/2}" cy="136" rx="9" ry="5" fill="#F2DEC8" stroke="#ddd" stroke-width="0.5"/>
+        <!-- RIGHT LEG — solid blue -->
+        <path d="M44 22 L74 22 L${rightAnkleOuter} 126 L${rightAnkleInner} 126 Z" fill="#B0CCF0" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Right knee crease -->
+        <path d="M${rightAnkleInner+2} 82 Q${(rightAnkleInner+rightAnkleOuter)/2} 86 ${rightAnkleOuter-2} 82" fill="none" stroke="#8AAAD8" stroke-width="1"/>
+        <!-- RIGHT FOOT -->
+        <ellipse cx="${(rightAnkleInner+rightAnkleOuter)/2}" cy="136" rx="9" ry="5" fill="#F2DEC8" stroke="#ddd" stroke-width="0.5"/>
+        <!-- Crotch seam -->
+        <path d="M6 22 Q6 50 40 52 Q74 50 74 22" fill="none" stroke="#1A1A1A" stroke-width="1.5"/>
+        <!-- Red ↔ arrow spanning left ankle width -->
+        <line x1="${leftAnkleOuter}" y1="120" x2="${leftAnkleInner}" y2="120" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"/>
+        <path d="M${leftAnkleOuter} 120 L${leftAnkleOuter+5} 116" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"/>
+        <path d="M${leftAnkleOuter} 120 L${leftAnkleOuter+5} 124" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"/>
+        <path d="M${leftAnkleInner} 120 L${leftAnkleInner-5} 116" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"/>
+        <path d="M${leftAnkleInner} 120 L${leftAnkleInner-5} 124" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+    }
     const PANT_FIT_DATA = [
-      { name: 'Skinny',   desc: 'Hip, thigh & ankle',
-        svg: `<svg viewBox="0 0 60 88" width="40" height="58" fill="none"><rect x="8" y="2" width="44" height="7" rx="2" fill="#C4D8F0" stroke="#6A9FCC" stroke-width="1.5"/><path d="M8 9 L52 9 L44 82 L35 82 L30 30 L25 82 L16 82 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/></svg>` },
-      { name: 'Slim',     desc: 'Hip & thigh',
-        svg: `<svg viewBox="0 0 60 88" width="40" height="58" fill="none"><rect x="8" y="2" width="44" height="7" rx="2" fill="#C4D8F0" stroke="#6A9FCC" stroke-width="1.5"/><path d="M8 9 L52 9 L46 82 L33 82 L30 30 L27 82 L14 82 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/></svg>` },
-      { name: 'Straight', desc: 'Modern straight',
-        svg: `<svg viewBox="0 0 60 88" width="40" height="58" fill="none"><rect x="8" y="2" width="44" height="7" rx="2" fill="#C4D8F0" stroke="#6A9FCC" stroke-width="1.5"/><path d="M8 9 L52 9 L50 82 L32 82 L30 30 L28 82 L10 82 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/></svg>` },
-      { name: 'Relaxed',  desc: 'Loose throughout',
-        svg: `<svg viewBox="0 0 60 88" width="40" height="58" fill="none"><rect x="8" y="2" width="44" height="7" rx="2" fill="#C4D8F0" stroke="#6A9FCC" stroke-width="1.5"/><path d="M8 9 L52 9 L52 82 L34 82 L30 30 L26 82 L8 82 Z" fill="#D6E8FA" stroke="#6A9FCC" stroke-width="1.5" stroke-linejoin="round"/></svg>` },
+      // leftAnkleOuter, leftAnkleInner, rightAnkleInner, rightAnkleOuter
+      { name: 'Skinny',   desc: 'Fitted through the hip, thigh, and ankle', svg: makePantSVG('sk', 8,  20, 60, 72) },
+      { name: 'Slim',     desc: 'Fitted the hip and thigh',                 svg: makePantSVG('sl', 7,  24, 56, 73) },
+      { name: 'Straight', desc: 'A modern and streamlined fit',             svg: makePantSVG('st', 6,  28, 52, 74) },
+      { name: 'Relaxed',  desc: 'A loose and comfortable fit with room',    svg: makePantSVG('rx', 4,  33, 47, 76) },
     ];
     const pantFitGrid = document.createElement('div');
-    pantFitGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:4px;';
+    pantFitGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;';
     let activePantFitCard = null;
     PANT_FIT_DATA.forEach(fit => {
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:10px 6px 8px;text-align:center;cursor:pointer;background:#fff;transition:all 0.15s;';
+      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:10px 4px 8px;text-align:center;cursor:pointer;background:#fff;transition:all 0.15s;';
       card.innerHTML = `
         <div style="margin-bottom:4px;">${fit.svg}</div>
-        <div style="font-size:12px;font-weight:600;margin-bottom:2px;color:#333;">${fit.name}</div>
+        <div style="font-size:11px;font-weight:600;margin-bottom:3px;color:#333;">${fit.name}</div>
         <div style="font-size:10px;color:#999;line-height:1.3;">${fit.desc}</div>
       `;
       card.addEventListener('click', () => {
@@ -2085,7 +2196,7 @@
 
     const lbl = document.createElement('div');
     lbl.className = 'widget-label';
-    lbl.textContent = widget.question;
+    lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
     wrap.appendChild(lbl);
 
     const hint = document.createElement('div');
@@ -2155,6 +2266,21 @@
     });
     wrap.appendChild(btn);
 
+    const skipColorBtn = document.createElement('button');
+    skipColorBtn.className = 'skip-btn';
+    skipColorBtn.textContent = 'Skip — open to all colors';
+    skipColorBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Open to all colors', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { [widget.field_prefer]: [], [widget.field_avoid]: [] },
+        value: 'Open to all colors',
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(skipColorBtn);
+
     outer.appendChild(wrap);
     messagesEl.appendChild(outer);
     scrollBottom();
@@ -2170,7 +2296,7 @@
 
     const lbl = document.createElement('div');
     lbl.className = 'widget-label';
-    lbl.textContent = widget.question;
+    lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
     wrap.appendChild(lbl);
 
     const hint = document.createElement('div');
@@ -2246,6 +2372,21 @@
       });
     });
     wrap.appendChild(btn);
+
+    const skipPrintBtn = document.createElement('button');
+    skipPrintBtn.className = 'skip-btn';
+    skipPrintBtn.textContent = 'Skip — open to all prints';
+    skipPrintBtn.addEventListener('click', async () => {
+      outer.remove();
+      addMessage('Open to all prints', 'user');
+      isWaitingForWidget = false;
+      await submitWidget({
+        fields: { [widget.field_prefer]: [], [widget.field_avoid]: [] },
+        value: 'Open to all prints',
+        tool_use_id: widget.tool_use_id
+      });
+    });
+    wrap.appendChild(skipPrintBtn);
 
     outer.appendChild(wrap);
     messagesEl.appendChild(outer);
