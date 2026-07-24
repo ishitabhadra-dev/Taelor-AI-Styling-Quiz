@@ -1313,10 +1313,10 @@
     if (role === 'user' && pendingWidgetQuestion) {
       const qWrap = document.createElement('div');
       qWrap.className = 'msg ai';
-      const qLabel = document.createElement('div');
-      qLabel.style.cssText = 'font-size:11.5px;color:#b0a898;padding:5px 12px;font-style:italic;background:#f5f2ee;border:1px solid #e8e3db;border-radius:10px;max-width:85%;';
-      qLabel.textContent = pendingWidgetQuestion;
-      qWrap.appendChild(qLabel);
+      const qBubble = document.createElement('div');
+      qBubble.className = 'bubble ai';
+      qBubble.textContent = pendingWidgetQuestion;
+      qWrap.appendChild(qBubble);
       messagesEl.appendChild(qWrap);
       pendingWidgetQuestion = '';
     }
