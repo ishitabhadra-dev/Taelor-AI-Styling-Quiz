@@ -2553,7 +2553,7 @@
     scrollBottom();
   }
 
-  // ── Combined Colors + Prints ──────────────────────────────────────────────
+  // ── Combined Colors + Prints (tabbed) ────────────────────────────────────
   function renderColorsPrints(widget) {
     const outer = document.createElement('div');
     outer.className = 'msg ai';
@@ -2565,21 +2565,36 @@
     const lbl = document.createElement('div');
     lbl.className = 'widget-label';
     lbl.style.fontSize = '15px';
-    lbl.style.marginBottom = '4px';
+    lbl.style.marginBottom = '8px';
     lbl.innerHTML = `${widget.question}<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>`;
     wrap.appendChild(lbl);
 
-    // ─ Colors section ─
-    const colorHead = document.createElement('div');
-    colorHead.style.cssText = 'font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#888;margin:6px 0 4px;';
-    colorHead.textContent = 'Colors';
-    wrap.appendChild(colorHead);
+    // ─ Tab bar ─
+    const tabBar = document.createElement('div');
+    tabBar.style.cssText = 'display:flex;gap:0;border-bottom:2px solid var(--color-border);margin-bottom:10px;';
 
-    const colorHint = document.createElement('div');
-    colorHint.className = 'color-hint';
-    colorHint.innerHTML = `<span><span class="hint-dot prefer"></span> Prefer</span><span><span class="hint-dot avoid"></span> Avoid</span><span style="color:#bbb">Tap to cycle</span>`;
-    wrap.appendChild(colorHint);
+    const TAB_STYLE_ACTIVE   = 'padding:7px 16px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;border:none;background:none;color:var(--color-text);border-bottom:2px solid var(--color-text);margin-bottom:-2px;transition:all 0.15s;';
+    const TAB_STYLE_INACTIVE = 'padding:7px 16px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;border:none;background:none;color:#aaa;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;';
 
+    const tabColors  = document.createElement('button');
+    const tabPrints  = document.createElement('button');
+    tabColors.textContent = 'Colors';
+    tabPrints.textContent = 'Patterns';
+    tabColors.style.cssText = TAB_STYLE_ACTIVE;
+    tabPrints.style.cssText = TAB_STYLE_INACTIVE;
+    tabBar.appendChild(tabColors);
+    tabBar.appendChild(tabPrints);
+    wrap.appendChild(tabBar);
+
+    // ─ Hint row (shared) ─
+    const hint = document.createElement('div');
+    hint.className = 'color-hint';
+    hint.style.marginBottom = '8px';
+    hint.innerHTML = `<span><span class="hint-dot prefer"></span> Prefer</span><span><span class="hint-dot avoid"></span> Avoid</span><span style="color:#bbb">Tap to cycle</span>`;
+    wrap.appendChild(hint);
+
+    // ─ Colors panel ─
+    const colorPanel = document.createElement('div');
     const colorGrid = document.createElement('div');
     colorGrid.className = 'color-grid';
     const colorState = {};
@@ -2605,24 +2620,12 @@
       item.appendChild(name);
       colorGrid.appendChild(item);
     });
-    wrap.appendChild(colorGrid);
+    colorPanel.appendChild(colorGrid);
+    wrap.appendChild(colorPanel);
 
-    // ─ Divider ─
-    const divider = document.createElement('div');
-    divider.style.cssText = 'height:1px;background:var(--color-border);margin:8px 0 6px;';
-    wrap.appendChild(divider);
-
-    // ─ Prints section ─
-    const printHead = document.createElement('div');
-    printHead.style.cssText = 'font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#888;margin-bottom:4px;';
-    printHead.textContent = 'Patterns & Prints';
-    wrap.appendChild(printHead);
-
-    const printHint = document.createElement('div');
-    printHint.className = 'prints-hint';
-    printHint.innerHTML = `<span><span class="hint-dot prefer"></span> Prefer</span><span><span class="hint-dot avoid"></span> Avoid</span><span style="color:#bbb">Tap to cycle</span>`;
-    wrap.appendChild(printHint);
-
+    // ─ Prints panel ─
+    const printPanel = document.createElement('div');
+    printPanel.style.display = 'none';
     const printGrid = document.createElement('div');
     printGrid.className = 'prints-grid';
     const printState = {};
@@ -2644,18 +2647,32 @@
         if (!curr) { printState[print.name] = 'prefer'; item.classList.add('prefer'); }
         else if (curr === 'prefer') { printState[print.name] = 'avoid'; item.classList.add('avoid'); }
         else { printState[print.name] = null; }
-        label.textContent = print.name;
       });
       item.appendChild(swatch);
       item.appendChild(label);
       printGrid.appendChild(item);
     });
-    wrap.appendChild(printGrid);
+    printPanel.appendChild(printGrid);
+    wrap.appendChild(printPanel);
+
+    // ─ Tab switching ─
+    tabColors.addEventListener('click', () => {
+      tabColors.style.cssText = TAB_STYLE_ACTIVE;
+      tabPrints.style.cssText = TAB_STYLE_INACTIVE;
+      colorPanel.style.display = '';
+      printPanel.style.display = 'none';
+    });
+    tabPrints.addEventListener('click', () => {
+      tabPrints.style.cssText = TAB_STYLE_ACTIVE;
+      tabColors.style.cssText = TAB_STYLE_INACTIVE;
+      printPanel.style.display = '';
+      colorPanel.style.display = 'none';
+    });
 
     // ─ Buttons ─
     const saveBtn = document.createElement('button');
     saveBtn.className = 'confirm-btn';
-    saveBtn.style.marginTop = '8px';
+    saveBtn.style.marginTop = '10px';
     saveBtn.textContent = 'Save preferences';
     saveBtn.addEventListener('click', async () => {
       const colorPrefer = Object.entries(colorState).filter(([,v]) => v === 'prefer').map(([k]) => k);
