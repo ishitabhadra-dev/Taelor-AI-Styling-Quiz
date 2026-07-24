@@ -98,7 +98,9 @@
 
     /* ── Chat card ───────────────────────────────────────────────────────── */
     #chat-card {
-      flex: 1;
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       background: var(--color-bg);
@@ -108,6 +110,39 @@
       overflow: hidden;
       height: calc(100vh - 54px - 32px - 24px);
       max-height: 820px;
+    }
+
+    /* ── In-card progress bar ────────────────────────────────────────────── */
+    #quiz-progress-wrap {
+      flex-shrink: 0;
+      padding: 8px 20px 6px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #quiz-progress-track {
+      flex: 1;
+      height: 5px;
+      background: var(--color-border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #quiz-progress-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      width: 0%;
+    }
+    #quiz-progress-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-accent);
+      white-space: nowrap;
+      min-width: 32px;
+      text-align: right;
     }
 
     #chat-intro {
@@ -806,8 +841,8 @@
     #send-btn:hover:not(:disabled) { opacity: 0.84; }
     #send-btn:disabled { opacity: 0.22; cursor: not-allowed; }
 
-    /* ── Profile side panel ──────────────────────────────────────────────── */
-    #profile-panel { width: 248px; flex-shrink: 0; }
+    /* ── Profile side panel — hidden (progress moved into chat card) ──────── */
+    #profile-panel { display: none; }
 
     .profile-card {
       background: var(--color-bg);
@@ -970,12 +1005,15 @@
       #page { flex-direction: column; padding: 0; gap: 0; }
       #profile-panel { display: none; }
       #mobile-progress { display: block; }
+      #quiz-progress-wrap { display: none; } /* mobile uses the thin strip under header instead */
       #chat-card {
         height: 100dvh;
         max-height: none;
         border-radius: 0;
         border: none;
         box-shadow: none;
+        max-width: none;
+        margin: 0;
       }
       #chat-intro { padding: 14px 16px 0; }
       #messages { padding: 14px 16px; }
@@ -1033,6 +1071,13 @@
 
     <div id="messages"></div>
 
+    <div id="quiz-progress-wrap">
+      <div id="quiz-progress-track">
+        <div id="quiz-progress-fill"></div>
+      </div>
+      <span id="quiz-progress-label">0%</span>
+    </div>
+
     <div id="input-row">
       <input id="user-input" type="text" placeholder="Reply here..." autocomplete="off" />
       <button id="send-btn">Send</button>
@@ -1069,6 +1114,8 @@
   const progressPct         = document.getElementById('progress-pct');
   const progressSublabel    = document.getElementById('progress-sublabel');
   const mobileProgressFill  = document.getElementById('mobile-progress-fill');
+  const quizProgressFill    = document.getElementById('quiz-progress-fill');
+  const quizProgressLabel   = document.getElementById('quiz-progress-label');
   const userInput           = document.getElementById('user-input');
   const sendBtn             = document.getElementById('send-btn');
 
@@ -1397,6 +1444,8 @@
     progressFill.style.width = pct + '%';
     progressPct.textContent = pct + '%';
     mobileProgressFill.style.width = pct + '%';
+    quizProgressFill.style.width = pct + '%';
+    quizProgressLabel.textContent = pct + '%';
 
     if (progressSublabel) {
       if (pct === 0)        progressSublabel.textContent = 'Just getting started';
@@ -3481,6 +3530,8 @@
       progressFill.style.width = '100%';
       progressPct.textContent = '100%';
       mobileProgressFill.style.width = '100%';
+      quizProgressFill.style.width = '100%';
+      quizProgressLabel.textContent = '100%';
       if (progressSublabel) progressSublabel.textContent = 'Profile complete 🎉';
 
       scrollBottom();
