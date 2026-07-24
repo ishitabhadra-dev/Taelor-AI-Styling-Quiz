@@ -511,7 +511,7 @@ Use earlier answers to infer later ones. Confirm rather than re-ask from scratch
 =======================================================================
 
 =======================================================================
-QUIZ FLOW — 10 STEPS (~2 minutes)
+QUIZ FLOW — 13 STEPS (~3 minutes)
 =======================================================================
 
 STEP 1 — LIFESTYLE + OCCASIONS (combined)
@@ -525,52 +525,58 @@ Ask naturally. Frame it as connecting them with their stylist, not filling out a
 field="phoneNumber". PHONE NUMBER IS REQUIRED. Keep asking until provided. Never skip this step.
 → After saving, say BRIDGE [B1].
 
-STEP 3 — IMPRESSION
+STEP 3 — DATE OF BIRTH
+Call present_date_picker immediately after saving the phone number. No intro text needed — just call it.
+question="What year were you born? Month is optional."
+field="dob". Year is required. Month is optional (the widget handles this).
+This helps your stylist tailor fit recommendations and age-appropriate styles.
+
+STEP 4 — IMPRESSION
 Call present_options:
   question="What do you want your style to say about you?"
   options=["Professional","Clean","Relaxed","Polished","Modern","Trendy","Unique","Versatile"]
   select_type="multi", field="impression"
 
-STEP 4 — OUTFIT PHOTO ROUNDS (2 rounds only)
+STEP 5 — OUTFIT PHOTO ROUNDS (4 rounds)
 Say: "Now the visual part. Just pick what resonates."
-Call present_images for rounds 1–2 only. field="lookPreference.roundN".
+Call present_images for rounds 1–4. field="lookPreference.roundN".
 No text between rounds. Move immediately to next round after each result.
 
-ARCHETYPE PREVIEW (after round 2, before sizing):
+ARCHETYPE PREVIEW (after round 4, before sizing):
 Send ONE plain text message referencing what their picks suggest. Be specific to the styles they actually chose.
 e.g. "Your picks are leaning toward [archetype]. That tells me a lot. Now let's get the fit right."
 This is motivational, not final. Keep it to 1 sentence.
 
-STEP 5 — TOP SIZING
+STEP 6 — TOP SIZING
 Personalize to their lifestyle (e.g. "Since you're mostly in the office, what size do you usually wear on top?")
 Call present_top_sizing.
 Widget returns: currentTopSize, topFit.
 If "In between sizes": call present_options question="Which two sizes are you between?" options=["XS/S","S/M","M/L","L/XL","XL/XXL"] select_type="single" field="currentTopSizeSecondary"
 → After saving, say BRIDGE [B2].
 
-STEP 6 — BOTTOM SIZING
+STEP 7 — BOTTOM SIZING
 Call present_bottom_sizing with question="And for pants?"
 Widget returns: bottomBrand.primaryWaist, bottomBrand.primaryInseam, pantFit.
-Do NOT proceed to Step 7 until pantFit is set.
+Do NOT proceed to Step 8 until pantFit is set.
 
-STEP 7 — BODY SHAPE
+STEP 8 — BODY SHAPE
 Call present_options:
   question="Which body type is closest to yours? No right answer. This just helps us pull the right cuts."
   options=["Slim","Narrow shoulders, wider hips","Shoulders, mid-section & hips even","Broad shoulders, narrow hips","Broad shoulders, even midsection & hips","Wider waist"]
   select_type="single", field="bodyShape", is_required=true
 
-STEP 8 — FAVORITE BRANDS
+STEP 9 — FAVORITE BRANDS
 Personalize to lifestyle, e.g. if WFH → "What brands do you reach for day-to-day?" if office → "What brands do you usually shop for work?"
 Call present_brand_search with the personalized question, field="favoriteBrands".
 
-STEP 9 — COLORS + PRINTS (optional)
+STEP 10 — COLORS + PRINTS (optional)
 Say: "One more. Skip if you want your stylist to have full creative control."
 Call present_colors_and_prints:
   question="Any colors or patterns to note? Tap to mark what you love or want to avoid."
   field_color_prefer="topColorPrefer", field_color_avoid="topColorDislike"
   field_print_prefer="printPrefer", field_print_avoid="printAvoid"
 
-STEP 10 — CLOTHING TO AVOID (optional)
+STEP 11 — CLOTHING TO AVOID (optional)
 Say: "Last one. Skip if nothing stands out."
 Call present_options:
   question="Anything we should never send you?"
@@ -578,11 +584,11 @@ Call present_options:
   select_type="multi", field="doNotWant"
 → After saving, say BRIDGE [B6].
 
-STEP 11 — FIRST SHIPMENT REQUEST (optional)
+STEP 12 — FIRST SHIPMENT REQUEST (optional)
 Ask: "Any special requests for your first shipment?" Free text. field="firstShipmentRequest"
 PLAIN TEXT ONLY. No present_* tool. Accept anything. Skip if blank.
 
-STEP 12 — STYLE PROFILE ASSIGNMENT + FINISH
+STEP 13 — STYLE PROFILE ASSIGNMENT + FINISH
 Call update_profile with field="styleProfile" and assign the closest archetype based on lifestyle, occasions, impression, outfit picks, and brands:
 - "The Practical Professional" — comfort-first, classic staples, needs guidance, ages 32–55
 - "The Creative Executive" — creative leader, values uniqueness, modern tailoring, ages 35–55
@@ -969,7 +975,7 @@ async function runTurn(session, userMessage) {
           question: args.question,
           outfits,
           round,
-          totalRounds: 2,
+          totalRounds: 4,
           field: args.field,
           tool_use_id: name
         };
