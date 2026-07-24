@@ -202,6 +202,17 @@
       border-bottom-right-radius: 4px;
     }
 
+    /* ── Message timestamps (iMessage-style) ────────────────────────────────── */
+    .msg-meta {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 3px;
+      padding: 0 3px;
+      letter-spacing: 0.01em;
+    }
+    .msg.user .msg-meta { text-align: right; }
+    .msg.ai  .msg-meta { text-align: left; }
+
     /* ── Typing indicator ────────────────────────────────────────────────── */
     .typing-wrap {
       display: flex;
@@ -1290,7 +1301,15 @@
     b.className = `bubble ${role}`;
     b.textContent = text;
     wrap.appendChild(b);
-messagesEl.appendChild(wrap);
+
+    // iMessage-style timestamp
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.textContent = role === 'user' ? `Sent • ${time}` : `Taelor • ${time}`;
+    wrap.appendChild(meta);
+
+    messagesEl.appendChild(wrap);
     scrollBottom();
   }
 
