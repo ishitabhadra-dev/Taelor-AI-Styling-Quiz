@@ -3176,7 +3176,7 @@
 
     // Year selector (required)
     const yearSel = document.createElement('select');
-    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:100px;';
+    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:100px;font-family:var(--font);color:var(--color-text);';
     const yearOpt0 = document.createElement('option');
     yearOpt0.value = ''; yearOpt0.textContent = 'Birth year';
     yearSel.appendChild(yearOpt0);
@@ -3189,7 +3189,7 @@
 
     // Month selector (optional)
     const monthSel = document.createElement('select');
-    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:120px;';
+    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:120px;font-family:var(--font);color:var(--color-text);';
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const monthOpt0 = document.createElement('option');
     monthOpt0.value = ''; monthOpt0.textContent = 'Month (optional)';
