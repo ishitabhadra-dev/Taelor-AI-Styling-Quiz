@@ -1120,7 +1120,7 @@
   const sendBtn             = document.getElementById('send-btn');
 
   let isWaitingForWidget = false;
-  let pendingWidgetQuestion = ''; // tracks last widget question so it stays visible after submit
+  let pendingWidgetQuestion = ''; // unused — kept to avoid reference errors
 
   // ── Field label map ────────────────────────────────────────────────────
   const FIELD_LABELS = {
@@ -1166,11 +1166,11 @@
 
   // ── Tip text for specific steps ────────────────────────────────────────
   const FIELD_TIPS = {
-    'currentTopSize':              'When between sizes, go with the larger one — we can always adjust.',
+    'currentTopSize':              'When between sizes, go with the larger one. We can always adjust.',
     'bottomBrand.primaryWaist':    'Check the inside of the waistband for a W number. Round up to the next whole number.',
     'bottomBrand.primaryInseam':   'Check your inseam tag or measure from crotch to ankle.',
     'heightFt':                    'Round to the nearest whole inch.',
-    'bodyShape':                   'Pick what feels closest — your stylist will refine this.',
+    'bodyShape':                   'Pick what feels closest. Your stylist will refine this.',
     'favoriteBrands':              'Select all that apply, even if you only bought from them once.',
     'doNotWant':                   'Tap anything you\'d never want us to send. Leave blank if you\'re open to everything.',
     'pant_size':                   'Check the inside of the waistband for a label like "W32/L30". Round up to the next whole number.',
@@ -1357,18 +1357,6 @@
   function addMessage(text, role) {
     if (!text) return;
 
-    // If replying to a widget, show the question as a small greyed label so it's
-    // still readable when scrolling back through the conversation.
-    if (role === 'user' && pendingWidgetQuestion) {
-      const qWrap = document.createElement('div');
-      qWrap.className = 'msg ai';
-      const qBubble = document.createElement('div');
-      qBubble.className = 'bubble ai';
-      qBubble.textContent = pendingWidgetQuestion;
-      qWrap.appendChild(qBubble);
-      messagesEl.appendChild(qWrap);
-      pendingWidgetQuestion = '';
-    }
 
     const wrap = document.createElement('div');
     wrap.className = `msg ${role}`;
@@ -2070,7 +2058,7 @@
     wrap.appendChild(waistRow);
 
     makeSizingSection(wrap, 'Pant Inseam (L) *');
-    makeSizingTip(wrap, 'The L number on the same tag — or measure from your crotch seam to your ankle.');
+    makeSizingTip(wrap, 'The L number on the same tag, or measure from your crotch seam to your ankle.');
     const inseamRow = document.createElement('div');
     inseamRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;';
     ['28','29','30','31','32','33','34','36','38+'].forEach(l => {
@@ -2896,7 +2884,7 @@
 
     const tip = document.createElement('div');
     tip.className = 'widget-tip';
-    tip.innerHTML = '<span class="widget-tip-icon">ⓘ</span><span>If you\'re active on social media and think it could help us know you better — share your handle or URL.</span>';
+    tip.innerHTML = '<span class="widget-tip-icon">ⓘ</span><span>If you\'re active on social media and think it could help us know you better, share your handle or URL.</span>';
     wrap.appendChild(tip);
 
     const inputsWrap = document.createElement('div');
@@ -3234,7 +3222,7 @@
 
     const tip = document.createElement('div');
     tip.className = 'widget-tip';
-    tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>Helps us style for your age — and we might send a birthday surprise!</span>';
+    tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>Helps us style for your age. We might send a birthday surprise too!</span>';
     wrap.appendChild(tip);
 
     const row = document.createElement('div');
@@ -3435,16 +3423,16 @@
       hideStillThinking();
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        if (res.status === 429) return { type: 'error', message: "You're moving fast — wait a moment and try again." };
-        return { type: 'error', message: err.error || 'Server error — please try again.' };
+        if (res.status === 429) return { type: 'error', message: "You're moving fast. Wait a moment and try again." };
+        return { type: 'error', message: err.error || 'Server error. Please try again.' };
       }
       return await res.json();
     } catch (err) {
       clearTimeout(thinkingTimer);
       clearTimeout(timeoutTimer);
       hideStillThinking();
-      if (err.name === 'AbortError') return { type: 'error', message: "That took too long — the server may be busy." };
-      return { type: 'error', message: "Can't reach the server — check your connection." };
+      if (err.name === 'AbortError') return { type: 'error', message: "That took too long. The server may be busy." };
+      return { type: 'error', message: "Can't reach the server. Check your connection." };
     }
   }
 
@@ -3515,7 +3503,7 @@
           </div>
           <div class="completion-step">
             <div class="completion-step-num">3</div>
-            <span>Your curated box arrives. Keep what you love, return the rest — no pressure.</span>
+            <span>Your curated box arrives. Keep what you love, return the rest. No pressure.</span>
           </div>
         </div>
         <a class="completion-cta" href="https://taelor.style" target="_blank" rel="noopener">Browse the collection →</a>
@@ -3524,7 +3512,7 @@
 
       // 3. Replace input bar with a locked state
       const inputRow = document.getElementById('input-row');
-      inputRow.innerHTML = '<div class="input-locked">Your style profile has been submitted — your stylist will be in touch soon.</div>';
+      inputRow.innerHTML = '<div class="input-locked">Your style profile has been submitted. Your stylist will be in touch soon.</div>';
 
       // 4. Update progress to 100%
       progressFill.style.width = '100%';
