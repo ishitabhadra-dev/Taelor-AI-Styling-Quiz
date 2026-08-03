@@ -284,10 +284,10 @@
 
     .widget-label {
       font-family: var(--font-display);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
       color: var(--color-text);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       line-height: 1.35;
       letter-spacing: -0.02em;
     }
@@ -301,10 +301,10 @@
     }
 
     .chip {
-      padding: 8px 16px;
+      padding: 10px 18px;
       border: 1.5px solid var(--color-border);
       border-radius: 100px;
-      font-size: 13px;
+      font-size: 14px;
       font-family: var(--font);
       cursor: pointer;
       background: var(--color-bg);
@@ -776,12 +776,12 @@
 
     /* ── Confirm button ──────────────────────────────────────────────────── */
     .confirm-btn {
-      padding: 11px 22px;
+      padding: 13px 24px;
       background: var(--color-accent);
       color: #f0f6ff;
       border: none;
       border-radius: var(--radius-md);
-      font-size: 13.5px;
+      font-size: 14.5px;
       font-weight: 600;
       font-family: var(--font);
       cursor: pointer;
@@ -2349,6 +2349,10 @@
           selectedIds.delete(outfit.id);
         }
         btn.disabled = selectedIds.size === 0;
+        // Scroll confirm button into view so user doesn't have to scroll down
+        if (selectedIds.size > 0) {
+          setTimeout(() => btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+        }
       });
 
       grid.appendChild(card);
@@ -2372,7 +2376,8 @@
     btn.disabled = true;
     btn.addEventListener('click', async () => {
       outer.remove();
-      addMessage(selectedIds.size === 1 ? '1 look selected ✓' : `${selectedIds.size} looks selected ✓`, 'user');
+      const selectedStyles = widget.outfits.filter(o => selectedIds.has(o.id)).map(o => o.style);
+      addMessage(selectedStyles.join(', '), 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: [...selectedIds], tool_use_id: widget.tool_use_id });
     });

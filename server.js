@@ -537,6 +537,7 @@ Call present_options:
   question="What do you want your style to say about you?"
   options=["Professional","Clean","Relaxed","Polished","Modern","Trendy","Unique","Versatile"]
   select_type="multi", field="impression"
+  other_placeholder="Anything else you'd add?"
 
 STEP 5 — OUTFIT PHOTO ROUNDS (4 rounds)
 Say: "Now the visual part. Just pick what resonates."
@@ -569,6 +570,7 @@ Call present_options:
   question="Which body type is closest to yours? No right answer. This just helps us pull the right cuts."
   options=["Slim","Narrow shoulders, wider hips","Shoulders, mid-section & hips even","Broad shoulders, narrow hips","Broad shoulders, even midsection & hips","Wider waist"]
   select_type="single", field="bodyShape", is_required=true
+  other_placeholder="Describe your body type in your own words"
 
 STEP 10 — FAVORITE BRANDS
 Personalize to lifestyle, e.g. if WFH → "What brands do you reach for day-to-day?" if office → "What brands do you usually shop for work?"
