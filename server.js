@@ -1159,7 +1159,12 @@ app.post('/api/chat', async (req, res) => {
     console.error('[API/CHAT ERROR]', err?.message || err);
     if (err?.status) console.error('[API/CHAT ERROR] HTTP status:', err.status);
     if (err?.errorDetails) console.error('[API/CHAT ERROR] details:', JSON.stringify(err.errorDetails));
-    res.status(500).json({ error: 'Something went wrong. Please try again.' });
+    // Expose underlying error in non-prod or via debug header for diagnosis
+    const debugMode = !IS_PROD || req.headers['x-debug-mode'] === process.env.DEBUG_SECRET;
+    res.status(500).json({
+      error: 'Something went wrong. Please try again.',
+      ...(debugMode && { _debug: { message: err?.message, status: err?.status, details: err?.errorDetails } })
+    });
   }
 });
 
