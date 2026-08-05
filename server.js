@@ -69,7 +69,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'not-set' });
 
 // ─── Session storage ──────────────────────────────────────────────────────────
 // Uses Upstash REST API directly (no package) when env vars present.
