@@ -6,8 +6,7 @@ const fs = require('fs');
 
 // ─── Validate required environment ───────────────────────────────────────────
 if (!process.env.OPENAI_API_KEY) {
-  console.error('[FATAL] OPENAI_API_KEY is not set. Copy .env.example → .env and add your key.');
-  process.exit(1);
+  console.error('[WARN] OPENAI_API_KEY is not set — /api/chat will return 503 until it is configured.');
 }
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -1151,6 +1150,7 @@ async function runTurn(session, userMessage) {
 // ─── Routes ──────────────────────────────────────────────────────────────────
 
 app.post('/api/chat', async (req, res) => {
+  if (!process.env.OPENAI_API_KEY) return res.status(503).json({ error: 'Service not configured. OPENAI_API_KEY missing.' });
   const ip = req.ip || req.socket?.remoteAddress || 'unknown';
   if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
   const { sessionId, message } = req.body;
