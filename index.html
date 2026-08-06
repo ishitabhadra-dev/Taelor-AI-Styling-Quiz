@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+  <!-- Prevent flash of wrong theme -->
+  <script>(function(){var t=localStorage.getItem('taelor-theme');if(t)document.documentElement.setAttribute('data-theme',t);})()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Taelor — Style Profile</title>
@@ -26,6 +28,58 @@
       --font:            'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --font-display:    'Playfair Display', Georgia, 'Times New Roman', serif;
       --transition:      0.15s ease;
+    }
+
+    /* ── Light theme ─────────────────────────────────────────────────────── */
+    html[data-theme="light"] {
+      --color-bg:        #ffffff;
+      --color-page:      #f5f0ea;
+      --color-text:      #1a1512;
+      --color-muted:     #7a6e5f;
+      --color-border:    #ddd6c8;
+      --color-soft:      #ede8e0;
+      --color-accent:    #b8922e;
+      --color-accent-bg: rgba(184,146,46,0.14);
+      --color-accent-dk: #9a7520;
+      --shadow-card:     0 1px 3px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+      --shadow-widget:   0 1px 2px rgba(0,0,0,0.05);
+    }
+    html[data-theme="light"] #messages::-webkit-scrollbar-thumb { background: #c8bfb2; }
+    html[data-theme="light"] .bubble.user { color: #ffffff; }
+    /* Logo: dark on light bg — no filter needed */
+    html[data-theme="light"] .logo img { filter: none !important; }
+    /* Outline inputs */
+    html[data-theme="light"] input[type="text"],
+    html[data-theme="light"] input[type="tel"],
+    html[data-theme="light"] input[type="email"],
+    html[data-theme="light"] input[type="number"],
+    html[data-theme="light"] textarea,
+    html[data-theme="light"] select {
+      background: #ffffff;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    /* ── Theme toggle button ─────────────────────────────────────────────── */
+    #theme-toggle {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-muted);
+      transition: all var(--transition);
+      flex-shrink: 0;
+      padding: 0;
+    }
+    #theme-toggle:hover {
+      background: var(--color-soft);
+      color: var(--color-accent);
+      border-color: var(--color-accent);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1049,9 +1103,15 @@
     <img src="https://taelor.style/cdn/shop/files/Taelor_BY_large_0aff0069-9ae7-4763-83be-fd280dcecfc7.png?v=1694555057"
          alt="Taelor" height="26" style="display:block; filter: brightness(0) invert(1);" />
   </a>
-  <div style="display:flex;align-items:center;gap:16px;">
+  <div style="display:flex;align-items:center;gap:12px;">
     <span class="header-right">Style Profile</span>
     <button id="start-over-btn" onclick="confirmStartOver()" style="display:none;font-size:12px;color:var(--color-muted);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline;text-underline-offset:2px;padding:0;">Start over</button>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode" aria-label="Toggle light/dark mode">
+      <!-- Sun icon (shown in dark mode) -->
+      <svg id="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <!-- Moon icon (shown in light mode) -->
+      <svg id="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
   </div>
 </header>
 <div id="mobile-progress"><div id="mobile-progress-fill"></div></div>
@@ -1066,7 +1126,7 @@
              alt="Taelor AI" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1.5px solid #3f3930;flex-shrink:0;" />
         <div>
           <div style="font-size:15px;font-weight:600;color:#f0e9dc;line-height:1.3;">Taelor AI</div>
-          <div style="font-size:12px;color:#a49a88;line-height:1.4;">Your personal stylist &middot; <span class="stylist-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;margin-right:3px;vertical-align:middle;box-shadow:0 0 0 2px rgba(74,222,128,0.25);"></span>Online</div>
+          <div style="font-size:12px;color:#a49a88;line-height:1.4;">Your personal stylist &middot; Trained by real stylists</div>
         </div>
       </div>
       <h2>Taelor Styling Session</h2>
@@ -1495,10 +1555,10 @@
     const wrap = document.createElement('div');
     wrap.className = 'widget-wrap';
 
-    // — Section 1: Lifestyle —
+    // — Combined single question —
     const lbl1 = document.createElement('div');
     lbl1.className = 'widget-label';
-    lbl1.innerHTML = 'What does your typical week look like?<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>';
+    lbl1.innerHTML = 'What does your lifestyle look like?<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>';
     wrap.appendChild(lbl1);
 
     const chips1 = document.createElement('div');
@@ -1520,17 +1580,11 @@
     });
     wrap.appendChild(chips1);
 
-    // — Divider —
-    const divider = document.createElement('div');
-    divider.style.cssText = 'height:1px;background:var(--color-border);margin:18px 0 14px;';
-    wrap.appendChild(divider);
-
-    // — Section 2: Occasions —
-    const lbl2 = document.createElement('div');
-    lbl2.className = 'widget-label';
-    lbl2.style.marginBottom = '10px';
-    lbl2.innerHTML = 'What are you mainly dressing for?<span style="color:#aaa;font-size:11px;font-weight:400;margin-left:6px;">(optional)</span>';
-    wrap.appendChild(lbl2);
+    // — Occasions sub-label —
+    const occ_lbl = document.createElement('div');
+    occ_lbl.style.cssText = 'font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-muted);margin:16px 0 8px;';
+    occ_lbl.textContent = 'What are you dressing for? (optional)';
+    wrap.appendChild(occ_lbl);
 
     const chips2 = document.createElement('div');
     chips2.className = 'chips';
@@ -3681,6 +3735,36 @@
   }
 
   launchQuiz();
+
+  /* ── Light / Dark mode toggle ─────────────────────────────────────── */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const sun  = document.getElementById('icon-sun');
+    const moon = document.getElementById('icon-moon');
+    const btn  = document.getElementById('theme-toggle');
+    if (theme === 'dark') {
+      if (sun)  sun.style.display  = '';
+      if (moon) moon.style.display = 'none';
+      if (btn)  btn.title = 'Switch to light mode';
+    } else {
+      if (sun)  sun.style.display  = 'none';
+      if (moon) moon.style.display = '';
+      if (btn)  btn.title = 'Switch to dark mode';
+    }
+  }
+
+  function toggleTheme() {
+    const curr = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = curr === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('taelor-theme', next);
+    applyTheme(next);
+  }
+
+  // Apply persisted theme on load
+  (function() {
+    const saved = localStorage.getItem('taelor-theme') || 'dark';
+    applyTheme(saved);
+  })();
 </script>
 </body>
 </html>
