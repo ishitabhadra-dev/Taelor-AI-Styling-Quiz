@@ -678,7 +678,7 @@
       width: 280px;
     }
     .social-input:focus { border-color: var(--color-text); }
-    .social-input::placeholder { color: #686256; }
+    .social-input::placeholder { color: var(--color-muted); }
 
     /* ── Height picker ───────────────────────────────────────────────────── */
     .height-section-label {
@@ -868,14 +868,43 @@
       font-family: var(--font);
       color: var(--color-text);
       outline: none;
-      background: #ffffff;
+      background: var(--color-soft);
       transition: border-color var(--transition), background var(--transition);
       min-height: 44px;
     }
 
-    #user-input:focus { border-color: var(--color-accent); background: #fff; }
-    #user-input::placeholder { color: #c0c0c0; }
-    #user-input:disabled { background: var(--color-soft); color: #ccc; }
+    #user-input:focus { border-color: var(--color-accent); background: var(--color-soft); }
+    #user-input::placeholder { color: var(--color-muted); }
+    #user-input:disabled { background: var(--color-soft); color: var(--color-muted); }
+
+    /* Dark mode — input typed text in warm amber so it reads clearly on dark bg */
+    html[data-theme="dark"] #user-input,
+    html[data-theme="dark"] .social-input,
+    html[data-theme="dark"] .dob-input,
+    html[data-theme="dark"] .date-input,
+    html[data-theme="dark"] input[type="text"],
+    html[data-theme="dark"] input[type="tel"],
+    html[data-theme="dark"] input[type="email"],
+    html[data-theme="dark"] input[type="number"],
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea {
+      color: #c88b38 !important;
+      background: #26221b !important;
+    }
+    html[data-theme="dark"] #user-input::placeholder,
+    html[data-theme="dark"] .social-input::placeholder,
+    html[data-theme="dark"] input::placeholder,
+    html[data-theme="dark"] textarea::placeholder { color: #6b5e4a; }
+
+    /* Override browser autofill white background in dark mode */
+    html[data-theme="dark"] input:-webkit-autofill,
+    html[data-theme="dark"] input:-webkit-autofill:hover,
+    html[data-theme="dark"] input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #c88b38 !important;
+      -webkit-box-shadow: 0 0 0px 1000px #26221b inset !important;
+      box-shadow: 0 0 0px 1000px #26221b inset !important;
+      caret-color: #c88b38;
+    }
 
     #send-btn {
       padding: 10px 18px;
@@ -2434,8 +2463,30 @@
     btn.disabled = true;
     btn.addEventListener('click', async () => {
       outer.remove();
-      const selectedStyles = widget.outfits.filter(o => selectedIds.has(o.id)).map(o => o.style);
-      addMessage(selectedStyles.join(', '), 'user');
+
+      // Show selected outfit thumbnails as the user bubble (no text label)
+      const selectedOutfits = widget.outfits.filter(o => selectedIds.has(o.id));
+      const msgWrap = document.createElement('div');
+      msgWrap.className = 'msg user';
+      const thumbRow = document.createElement('div');
+      thumbRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;';
+      selectedOutfits.forEach(o => {
+        const thumb = document.createElement('img');
+        thumb.src = o.img;
+        thumb.alt = o.style;
+        thumb.style.cssText = 'width:64px;height:64px;object-fit:cover;border-radius:8px;border:2px solid var(--color-accent);display:block;';
+        thumbRow.appendChild(thumb);
+      });
+      msgWrap.appendChild(thumbRow);
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      meta.style.textAlign = 'right';
+      meta.textContent = `Sent • ${time}`;
+      msgWrap.appendChild(meta);
+      messagesEl.appendChild(msgWrap);
+      scrollBottom();
+
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: [...selectedIds], tool_use_id: widget.tool_use_id });
     });
@@ -3293,7 +3344,7 @@
 
     // Year selector (required)
     const yearSel = document.createElement('select');
-    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:100px;font-family:var(--font);color:var(--color-text);';
+    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:100px;font-family:var(--font);color:var(--color-text);outline:none;';
     const yearOpt0 = document.createElement('option');
     yearOpt0.value = ''; yearOpt0.textContent = 'Birth year';
     yearSel.appendChild(yearOpt0);
@@ -3306,7 +3357,7 @@
 
     // Month selector (optional)
     const monthSel = document.createElement('select');
-    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;background:#fff;cursor:pointer;min-width:120px;font-family:var(--font);color:var(--color-text);';
+    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:120px;font-family:var(--font);color:var(--color-text);outline:none;';
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const monthOpt0 = document.createElement('option');
     monthOpt0.value = ''; monthOpt0.textContent = 'Month (optional)';
@@ -3648,6 +3699,8 @@
   }
 
   async function launchQuiz() {
+    // Welcome message — always shows immediately before the first widget loads
+    addMessage("Hey! I'll be putting your first Taelor box together. Just need a few things from you — I'll handle the rest.", 'ai');
     addTyping();
     await fetch('/health').catch(() => {});
     await new Promise(r => setTimeout(r, 1000));
