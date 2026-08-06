@@ -6,25 +6,25 @@
   <title>Taelor — Style Profile</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* Midnight Sartorial — Smart Way to Dress */
-      --color-bg:        #FAF7F3;   /* warm cream — keeps warmth against midnight blue */
-      --color-page:      #F5F2EE;   /* slightly deeper cream page */
-      --color-text:      #0a192f;   /* midnight blue — primary text */
-      --color-muted:     #5a7089;   /* muted slate — secondary text */
-      --color-border:    #dde3ea;   /* cool silver — borders */
-      --color-soft:      #f0f3f6;   /* cool off-white — hover/input bg */
-      --color-accent:    #0a192f;   /* midnight blue — CTAs, selections, progress */
-      --color-accent-bg: #e6edf5;   /* midnight tint — soft selected state */
-      --color-accent-dk: #061323;   /* deeper midnight — hover state */
-      --radius-md:       8px;       /* ROUND_EIGHT — sharp, structured */
-      --radius-lg:       12px;      /* cards and containers */
-      --shadow-card:     0 1px 3px rgba(10,25,47,0.08), 0 8px 24px rgba(10,25,47,0.06);
-      --shadow-widget:   0 1px 2px rgba(10,25,47,0.05);
-      --font:            'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-display:    'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Taelor Dark — report.taelor.style design system */
+      --color-bg:        #1b1813;   /* surface — chat card, bubbles */
+      --color-page:      #17130f;   /* page background */
+      --color-text:      #f0e9dc;   /* warm cream — primary text */
+      --color-muted:     #a49a88;   /* warm muted — secondary text */
+      --color-border:    #3f3930;   /* warm dark border */
+      --color-soft:      #26221b;   /* tertiary surface — inputs, hover */
+      --color-accent:    #d5ad5b;   /* gold — CTAs, selections, progress */
+      --color-accent-bg: rgba(213,173,91,0.15); /* gold tint — soft selected state */
+      --color-accent-dk: #b8922e;   /* deeper gold — hover state */
+      --radius-md:       10px;
+      --radius-lg:       14px;
+      --shadow-card:     0 1px 3px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+      --shadow-widget:   0 1px 2px rgba(0,0,0,0.3);
+      --font:            'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-display:    'Playfair Display', Georgia, 'Times New Roman', serif;
       --transition:      0.15s ease;
     }
 
@@ -152,13 +152,13 @@
 
     #chat-intro h2 {
       font-family: var(--font);
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
       line-height: 1.4;
       margin-bottom: 4px;
       text-transform: uppercase;
-      color: var(--color-text);
+      color: var(--color-accent);
     }
 
     #chat-intro p {
@@ -204,7 +204,7 @@
 
     #messages::-webkit-scrollbar { width: 4px; }
     #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
+    #messages::-webkit-scrollbar-thumb { background: #3f3930; border-radius: 2px; }
 
     .msg { display: flex; flex-direction: column; }
     .msg.ai   { align-items: flex-start; }
@@ -226,25 +226,26 @@
     }
 
     .bubble.ai {
-      background: #ffffff;
+      background: var(--color-soft);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       border-bottom-left-radius: 2px;
       color: var(--color-text);
-      box-shadow: 0 1px 3px rgba(10,25,47,0.06);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
     .bubble.user {
-      background: #0a192f;
-      color: #f0f6ff;
+      background: var(--color-accent);
+      color: #17130f;
       border-radius: var(--radius-md);
       border-bottom-right-radius: 2px;
+      font-weight: 500;
     }
 
     /* ── Message timestamps (iMessage-style) ────────────────────────────────── */
     .msg-meta {
       font-size: 11px;
-      color: #bbb;
+      color: var(--color-muted);
       margin-top: 3px;
       padding: 0 3px;
       letter-spacing: 0.01em;
@@ -257,18 +258,18 @@
       display: flex;
       gap: 5px;
       padding: 12px 16px;
-      background: #ffffff;
+      background: var(--color-soft);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       border-bottom-left-radius: 2px;
       align-self: flex-start;
       width: fit-content;
-      box-shadow: 0 1px 3px rgba(10,25,47,0.06);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
     .typing-wrap span {
       width: 5px; height: 5px;
-      background: #aaa; border-radius: 50%;
+      background: var(--color-muted); border-radius: 50%;
       animation: bounce 1.3s ease-in-out infinite;
     }
     .typing-wrap span:nth-child(2) { animation-delay: 0.18s; }
@@ -284,12 +285,12 @@
 
     .widget-label {
       font-family: var(--font-display);
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 500;
       color: var(--color-text);
       margin-bottom: 14px;
       line-height: 1.35;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
     }
 
     /* ── Chip widget ─────────────────────────────────────────────────────── */
@@ -337,7 +338,7 @@
       position: relative;
     }
 
-    .garment-card:hover { border-color: #aaa; }
+    .garment-card:hover { border-color: #686256; }
     .garment-card.selected { border-color: #dc2626; }
 
     .garment-card.selected::after {
@@ -398,7 +399,7 @@
       position: relative;
     }
 
-    .outfit-card:hover { border-color: #aaa; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .outfit-card:hover { border-color: #686256; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
     .outfit-card.selected { border-color: var(--color-accent); border-width: 2.5px; }
 
     .outfit-card.selected::after {
@@ -449,7 +450,7 @@
       font-size: 12px;
       color: var(--color-muted);
       cursor: pointer;
-      background: #f8f5f1;
+      background: transparent;
       border: 1.5px solid var(--color-border);
       border-radius: 100px;
       font-family: var(--font);
@@ -465,8 +466,8 @@
 
     .skip-btn:hover {
       color: var(--color-text);
-      border-color: #bbb;
-      background: #ede9e3;
+      border-color: #686256;
+      background: var(--color-soft);
     }
 
     /* ── Tip text ────────────────────────────────────────────────────────── */
@@ -483,8 +484,8 @@
 
     /* ── Handoff banner ──────────────────────────────────────────────────── */
     .handoff-banner {
-      background: #fff8f0;
-      border: 1.5px solid #f59e0b;
+      background: rgba(213,173,91,0.1);
+      border: 1.5px solid var(--color-accent);
       border-radius: var(--radius-md);
       padding: 14px 18px;
       font-size: 14px;
@@ -496,8 +497,8 @@
     .handoff-cta {
       display: inline-block;
       padding: 9px 18px;
-      background: #f59e0b;
-      color: #fff;
+      background: var(--color-accent);
+      color: #17130f;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
@@ -582,7 +583,7 @@
       position: relative;
       background: var(--color-soft);
     }
-    .upload-box:hover { border-color: #aaa; }
+    .upload-box:hover { border-color: #686256; }
     .upload-box.has-image { border-style: solid; border-color: var(--color-border); }
     .upload-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .upload-box-icon { font-size: 22px; color: var(--color-muted); line-height: 1; }
@@ -623,7 +624,7 @@
       width: 280px;
     }
     .social-input:focus { border-color: var(--color-text); }
-    .social-input::placeholder { color: #c0c0c0; }
+    .social-input::placeholder { color: #686256; }
 
     /* ── Height picker ───────────────────────────────────────────────────── */
     .height-section-label {
@@ -653,7 +654,7 @@
       transition: all 0.12s;
       user-select: none;
     }
-    .height-btn:hover { border-color: #aaa; }
+    .height-btn:hover { border-color: #686256; background: var(--color-soft); }
     .height-btn.selected { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 
     /* ── Color picker ────────────────────────────────────────────────────── */
@@ -745,9 +746,9 @@
       transition: all 0.15s;
     }
 
-    .print-item:hover { border-color: #aaa; }
-    .print-item.prefer { border-color: #16a34a; background: #f0fdf4; }
-    .print-item.avoid  { border-color: #dc2626; background: #fff5f5; }
+    .print-item:hover { border-color: #686256; background: var(--color-soft); }
+    .print-item.prefer { border-color: #4ade80; background: rgba(74,222,128,0.08); }
+    .print-item.avoid  { border-color: #f87171; background: rgba(248,113,113,0.08); }
 
     .print-swatch {
       width: 38px; height: 38px;
