@@ -534,7 +534,7 @@ This helps your stylist tailor fit recommendations and age-appropriate styles.
 
 STEP 4 — IMPRESSION
 Call present_options:
-  question="What do you want your style to say about you?"
+  question="What style do you want to achieve?"
   options=["Professional","Clean","Relaxed","Polished","Modern","Trendy","Unique","Versatile"]
   select_type="multi", field="impression"
   other_placeholder="Anything else you'd add?"
@@ -1138,6 +1138,17 @@ async function runTurn(session, userMessage) {
     }
 
     if (widgetToRender) {
+      // Stub-respond to any tool calls we never reached (came after the widget in the array).
+      // OpenAI requires EVERY tool_call_id in an assistant message to have a matching
+      // tool response before the next API call — even ones we didn't process.
+      const respondedIds = new Set(toolResponses.map(tr => tr.tool_call_id));
+      respondedIds.add(session._pendingToolCallId); // widget response comes later via widget-response
+      for (const tc of toolCalls) {
+        if (!respondedIds.has(tc.id)) {
+          toolResponses.push({ role: 'tool', tool_call_id: tc.id, content: 'Acknowledged.' });
+        }
+      }
+
       // Stash inline tool responses (update_profile etc. that ran before the widget)
       // so /api/widget-response can push them + the widget response together.
       session.pendingToolResults = toolResponses;
