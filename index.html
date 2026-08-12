@@ -1791,81 +1791,21 @@
 
     let selectedOpt = null;
 
-    // SVG shirt illustrations — Taelor style (blue shirt, collar, orange side-seam stripe)
-    // Orange stripe width = visual indicator of how much room the fit has
-    const FIT_SVGS = {
-      // Slim: narrow orange stripe (close to body)
-      'Slim': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
-        <!-- Hanger -->
-        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
-        <!-- Left sleeve -->
-        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <!-- Shirt body -->
-        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <!-- Collar stand/dark back -->
-        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
-        <!-- Collar left flap -->
-        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <!-- Collar right flap -->
-        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <!-- Button placket (dark center strip) -->
-        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
-        <!-- Shirt crease detail -->
-        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
-        <!-- SLIM: narrow orange stripe — close fit -->
-        <rect x="20" y="60" width="5" height="44" fill="#E8960A" rx="1"/>
-        <!-- Side seam line -->
-        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
-        <!-- Red arrow -->
-        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>`,
-      // Regular: medium orange stripe
-      'Regular': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
-        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
-        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
-        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
-        <!-- REGULAR: medium orange stripe -->
-        <rect x="13" y="60" width="12" height="44" fill="#E8960A" rx="1"/>
-        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
-        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>`,
-      // Relaxed: wide orange stripe (lots of room)
-      'Relaxed': `<svg viewBox="0 0 90 122" width="72" height="98" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="52" cy="5" rx="10" ry="5" fill="#e0e0e0" stroke="#bbb" stroke-width="1"/>
-        <path d="M24 24 L5 32 L3 88 L24 82 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M24 22 L24 118 L84 118 L84 22 L66 12 L52 18 L38 12 Z" fill="#C2D8F2" stroke="#6090CC" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M38 12 L52 18 L66 12 L60 6 L52 10 L44 6 Z" fill="#4470B0" stroke="#3560A0" stroke-width="1"/>
-        <path d="M38 12 L52 18 L48 28 L36 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <path d="M66 12 L52 18 L56 28 L68 18 Z" fill="#5A82C0" stroke="#4470B0" stroke-width="1"/>
-        <rect x="55" y="28" width="9" height="90" fill="#4470B0" rx="1" opacity="0.85"/>
-        <path d="M40 46 Q43 62 40 78" fill="none" stroke="#A0C0E8" stroke-width="1.2" opacity="0.7"/>
-        <!-- RELAXED: wide orange stripe — lots of room -->
-        <rect x="5" y="60" width="20" height="44" fill="#E8960A" rx="1"/>
-        <line x1="24" y1="22" x2="24" y2="118" stroke="#6090CC" stroke-width="1.2"/>
-        <path d="M44 82 L28 82" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 76" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M28 82 L36 88" stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>`,
+    const FIT_IMGS = {
+      'Slim':    '<img src="/fit-slim.png"    alt="Slim fit"    style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
+      'Regular': '<img src="/fit-regular.png" alt="Regular fit" style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
+      'Relaxed': '<img src="/fit-relaxed.png" alt="Relaxed fit" style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
     };
 
     widget.options.forEach((opt, i) => {
       const desc = widget.descriptions?.[i] || '';
-      const svg = FIT_SVGS[opt] || '';
+      const img = FIT_IMGS[opt] || '';
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:12px;padding:14px 10px 12px;text-align:center;cursor:pointer;transition:all 0.15s;background:#fff;';
+      card.style.cssText = 'border:2px solid var(--color-border);border-radius:12px;padding:14px 10px 12px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--color-soft);';
       card.innerHTML = `
-        <div style="color:#B8844A;margin-bottom:6px;">${svg}</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${opt}</div>
-        <div style="font-size:11px;color:#888;line-height:1.4;">${desc}</div>
+        <div style="margin-bottom:8px;">${img}</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--color-text);">${opt}</div>
+        <div style="font-size:11px;color:var(--color-muted);line-height:1.4;">${desc}</div>
       `;
       card.addEventListener('click', () => {
         grid.querySelectorAll('div[data-fit-card]').forEach(c => {
