@@ -1609,28 +1609,6 @@
     });
     wrap.appendChild(chips1);
 
-    // — Occasions sub-label —
-    const occ_lbl = document.createElement('div');
-    occ_lbl.style.cssText = 'font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-muted);margin:16px 0 8px;';
-    occ_lbl.textContent = 'What are you dressing for? (optional)';
-    wrap.appendChild(occ_lbl);
-
-    const chips2 = document.createElement('div');
-    chips2.className = 'chips';
-    const selectedOccasions = new Set();
-
-    OCCASION_OPTIONS.forEach(opt => {
-      const c = document.createElement('div');
-      c.className = 'chip';
-      c.textContent = opt;
-      c.addEventListener('click', () => {
-        c.classList.toggle('selected');
-        selectedOccasions[c.classList.contains('selected') ? 'add' : 'delete'](opt);
-      });
-      chips2.appendChild(c);
-    });
-    wrap.appendChild(chips2);
-
     // — Error + Confirm —
     const errEl = document.createElement('div');
     errEl.style.cssText = 'color:#e53e3e;font-size:12px;margin-top:8px;display:none;';
@@ -1647,16 +1625,12 @@
         errEl.style.display = 'block';
         return;
       }
-      const occasions = [...selectedOccasions];
-      const summary = occasions.length
-        ? `${selectedLifestyle} · ${occasions.join(', ')}`
-        : selectedLifestyle;
       outer.remove();
-      addMessage(summary, 'user');
+      addMessage(selectedLifestyle, 'user');
       isWaitingForWidget = false;
       await submitWidget({
-        fields: { lifestyle: selectedLifestyle, occasions },
-        value: summary,
+        fields: { lifestyle: selectedLifestyle, occasions: [] },
+        value: selectedLifestyle,
         tool_use_id: widget.tool_use_id
       });
     });
