@@ -1982,7 +1982,7 @@
     FIT_CARDS.forEach(card => {
       const btn = document.createElement('button');
       btn.style.cssText = 'border:2px solid var(--color-border);border-radius:10px;overflow:hidden;text-align:center;cursor:pointer;background:var(--color-soft);flex:1;touch-action:manipulation;transition:all 0.15s;padding:0;';
-      btn.innerHTML = `<img src="${card.img}" alt="${card.name} fit" style="width:100%;height:140px;object-fit:contain;background:#fff;display:block;"><div style="padding:6px 4px 8px;"><div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:var(--color-muted);margin-top:2px;line-height:1.3;">${card.desc}</div></div>`;
+      btn.innerHTML = `<img src="${card.img}" alt="${card.name} fit" style="width:100%;height:180px;object-fit:contain;background:#fff;display:block;"><div style="padding:6px 4px 8px;"><div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:var(--color-muted);margin-top:2px;line-height:1.3;">${card.desc}</div></div>`;
       btn.addEventListener('click', () => {
         if (activeFitBtn) { activeFitBtn.style.borderColor='var(--color-border)'; activeFitBtn.style.boxShadow=''; }
         btn.style.borderColor='#B8844A'; btn.style.boxShadow='0 0 0 1px #B8844A';
@@ -2126,22 +2126,23 @@
       </svg>`;
     }
     const PANT_FIT_DATA = [
-      // leftAnkleOuter, leftAnkleInner, rightAnkleInner, rightAnkleOuter
-      { name: 'Skinny',   desc: 'Fitted through the hip, thigh, and ankle', svg: makePantSVG('sk', 8,  20, 60, 72) },
-      { name: 'Slim',     desc: 'Fitted the hip and thigh',                 svg: makePantSVG('sl', 7,  24, 56, 73) },
-      { name: 'Straight', desc: 'A modern and streamlined fit',             svg: makePantSVG('st', 6,  28, 52, 74) },
-      { name: 'Relaxed',  desc: 'A loose and comfortable fit with room',    svg: makePantSVG('rx', 4,  33, 47, 76) },
+      { name: 'Skinny',   desc: 'Fitted through hip, thigh, and ankle', img: 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/pants-skinny.jpg?v=1713601331'   },
+      { name: 'Slim',     desc: 'Fitted at the hip and thigh',          img: 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/pants-slim.jpg?v=1713601331'     },
+      { name: 'Straight', desc: 'A modern and streamlined fit',         img: 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/pants-straight.jpg?v=1713601333' },
+      { name: 'Relaxed',  desc: 'Loose and comfortable with room',      img: 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/pants-relaxed.jpg?v=1713601332'  },
     ];
     const pantFitGrid = document.createElement('div');
     pantFitGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;';
     let activePantFitCard = null;
     PANT_FIT_DATA.forEach(fit => {
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:10px 4px 8px;text-align:center;cursor:pointer;background:#fff;transition:all 0.15s;';
+      card.style.cssText = 'border:2px solid var(--color-border);border-radius:10px;overflow:hidden;text-align:center;cursor:pointer;background:var(--color-soft);transition:all 0.15s;';
       card.innerHTML = `
-        <div style="margin-bottom:4px;">${fit.svg}</div>
-        <div style="font-size:11px;font-weight:600;margin-bottom:3px;color:#333;">${fit.name}</div>
-        <div style="font-size:10px;color:#999;line-height:1.3;">${fit.desc}</div>
+        <img src="${fit.img}" alt="${fit.name}" style="width:100%;height:120px;object-fit:contain;background:#fff;display:block;">
+        <div style="padding:6px 4px 8px;">
+          <div style="font-size:11px;font-weight:600;margin-bottom:3px;color:var(--color-text);">${fit.name}</div>
+          <div style="font-size:10px;color:var(--color-muted);line-height:1.3;">${fit.desc}</div>
+        </div>
       `;
       card.addEventListener('click', () => {
         if (activePantFitCard) {
