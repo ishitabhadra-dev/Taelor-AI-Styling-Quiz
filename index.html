@@ -1823,7 +1823,7 @@
       const card = document.createElement('div');
       card.style.cssText = 'border:2px solid var(--color-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.15s;background:var(--color-soft);';
       card.innerHTML = `
-        ${src ? `<img src="${src}" alt="${opt} fit" style="width:100%;height:180px;object-fit:cover;object-position:top;display:block;">` : ''}
+        ${src ? `<img src="${src}" alt="${opt} fit" style="width:100%;height:180px;object-fit:contain;background:#fff;display:block;">` : ''}
         <div style="padding:10px 12px 12px;">
           <div style="font-size:15px;font-weight:700;margin-bottom:3px;color:var(--color-text);">${opt}</div>
           <div style="font-size:12px;color:var(--color-muted);line-height:1.4;">${desc}</div>
@@ -1982,7 +1982,7 @@
     FIT_CARDS.forEach(card => {
       const btn = document.createElement('button');
       btn.style.cssText = 'border:2px solid var(--color-border);border-radius:10px;overflow:hidden;text-align:center;cursor:pointer;background:var(--color-soft);flex:1;touch-action:manipulation;transition:all 0.15s;padding:0;';
-      btn.innerHTML = `<img src="${card.img}" alt="${card.name} fit" style="width:100%;height:100px;object-fit:cover;object-position:top;display:block;"><div style="padding:6px 4px 8px;"><div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:var(--color-muted);margin-top:2px;line-height:1.3;">${card.desc}</div></div>`;
+      btn.innerHTML = `<img src="${card.img}" alt="${card.name} fit" style="width:100%;height:140px;object-fit:contain;background:#fff;display:block;"><div style="padding:6px 4px 8px;"><div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:var(--color-muted);margin-top:2px;line-height:1.3;">${card.desc}</div></div>`;
       btn.addEventListener('click', () => {
         if (activeFitBtn) { activeFitBtn.style.borderColor='var(--color-border)'; activeFitBtn.style.boxShadow=''; }
         btn.style.borderColor='#B8844A'; btn.style.boxShadow='0 0 0 1px #B8844A';
@@ -3254,16 +3254,39 @@
     tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>Helps us style for your age. We might send a birthday surprise too!</span>';
     wrap.appendChild(tip);
 
-    // Native month picker — opens calendar-style month/year selector
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px;';
+
     const curYear = new Date().getFullYear();
-    const monthInput = document.createElement('input');
-    monthInput.type = 'month';
-    monthInput.max = `${curYear - 18}-12`;
-    monthInput.min = '1930-01';
-    monthInput.style.cssText = 'width:100%;padding:12px 14px;border:1.5px solid var(--color-border);border-radius:10px;font-size:16px;background:var(--color-soft);color:var(--color-text);font-family:var(--font);outline:none;cursor:pointer;margin-bottom:4px;box-sizing:border-box;';
-    monthInput.addEventListener('focus', () => monthInput.style.borderColor = 'var(--color-accent)');
-    monthInput.addEventListener('blur',  () => monthInput.style.borderColor = 'var(--color-border)');
-    wrap.appendChild(monthInput);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Year selector (required)
+    const yearSel = document.createElement('select');
+    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:100px;font-family:var(--font);color:var(--color-text);outline:none;';
+    const yearOpt0 = document.createElement('option');
+    yearOpt0.value = ''; yearOpt0.textContent = 'Birth year';
+    yearSel.appendChild(yearOpt0);
+    for (let y = curYear - 18; y >= 1930; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      yearSel.appendChild(o);
+    }
+
+    // Month selector (optional)
+    const monthSel = document.createElement('select');
+    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:120px;font-family:var(--font);color:var(--color-text);outline:none;';
+    const monthOpt0 = document.createElement('option');
+    monthOpt0.value = ''; monthOpt0.textContent = 'Month (optional)';
+    monthSel.appendChild(monthOpt0);
+    months.forEach((m, i) => {
+      const o = document.createElement('option');
+      o.value = String(i + 1).padStart(2, '0'); o.textContent = m;
+      monthSel.appendChild(o);
+    });
+
+    row.appendChild(yearSel);
+    row.appendChild(monthSel);
+    wrap.appendChild(row);
 
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
@@ -3272,16 +3295,13 @@
     btn.style.marginTop = '12px';
     btn.style.display = 'block';
 
-    monthInput.addEventListener('change', () => { btn.disabled = !monthInput.value; });
-
-    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    yearSel.addEventListener('change', () => { btn.disabled = !yearSel.value; });
 
     btn.addEventListener('click', async () => {
-      const val = monthInput.value; // "YYYY-MM"
-      if (!val) return;
-      const [year, month] = val.split('-');
-      const formatted = `${month}/01/${year}`;
-      const display = `${MONTH_NAMES[parseInt(month) - 1]} ${year}`;
+      const year = yearSel.value;
+      const month = monthSel.value;
+      const formatted = month ? `${month}/01/${year}` : `01/01/${year}`;
+      const display = month ? `${months[parseInt(month)-1]} ${year}` : year;
       collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
