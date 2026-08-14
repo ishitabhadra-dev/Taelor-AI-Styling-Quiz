@@ -3254,38 +3254,16 @@
     tip.innerHTML = '<span class="widget-tip-icon">🎂</span><span>Helps us style for your age. We might send a birthday surprise too!</span>';
     wrap.appendChild(tip);
 
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px;';
-
-    // Year selector (required)
-    const yearSel = document.createElement('select');
-    yearSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:100px;font-family:var(--font);color:var(--color-text);outline:none;';
-    const yearOpt0 = document.createElement('option');
-    yearOpt0.value = ''; yearOpt0.textContent = 'Birth year';
-    yearSel.appendChild(yearOpt0);
+    // Native month picker — opens calendar-style month/year selector
     const curYear = new Date().getFullYear();
-    for (let y = curYear - 18; y >= 1930; y--) {
-      const o = document.createElement('option');
-      o.value = y; o.textContent = y;
-      yearSel.appendChild(o);
-    }
-
-    // Month selector (optional)
-    const monthSel = document.createElement('select');
-    monthSel.style.cssText = 'padding:10px 12px;border:1.5px solid var(--color-border);border-radius:10px;font-size:15px;background:var(--color-soft);cursor:pointer;min-width:120px;font-family:var(--font);color:var(--color-text);outline:none;';
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const monthOpt0 = document.createElement('option');
-    monthOpt0.value = ''; monthOpt0.textContent = 'Month (optional)';
-    monthSel.appendChild(monthOpt0);
-    months.forEach((m, i) => {
-      const o = document.createElement('option');
-      o.value = String(i + 1).padStart(2, '0'); o.textContent = m;
-      monthSel.appendChild(o);
-    });
-
-    row.appendChild(yearSel);
-    row.appendChild(monthSel);
-    wrap.appendChild(row);
+    const monthInput = document.createElement('input');
+    monthInput.type = 'month';
+    monthInput.max = `${curYear - 18}-12`;
+    monthInput.min = '1930-01';
+    monthInput.style.cssText = 'width:100%;padding:12px 14px;border:1.5px solid var(--color-border);border-radius:10px;font-size:16px;background:var(--color-soft);color:var(--color-text);font-family:var(--font);outline:none;cursor:pointer;margin-bottom:4px;box-sizing:border-box;';
+    monthInput.addEventListener('focus', () => monthInput.style.borderColor = 'var(--color-accent)');
+    monthInput.addEventListener('blur',  () => monthInput.style.borderColor = 'var(--color-border)');
+    wrap.appendChild(monthInput);
 
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
@@ -3294,13 +3272,16 @@
     btn.style.marginTop = '12px';
     btn.style.display = 'block';
 
-    yearSel.addEventListener('change', () => { btn.disabled = !yearSel.value; });
+    monthInput.addEventListener('change', () => { btn.disabled = !monthInput.value; });
+
+    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
     btn.addEventListener('click', async () => {
-      const year = yearSel.value;
-      const month = monthSel.value;
-      const formatted = month ? `${month}/01/${year}` : `01/01/${year}`;
-      const display = month ? `${months[parseInt(month)-1]} ${year}` : year;
+      const val = monthInput.value; // "YYYY-MM"
+      if (!val) return;
+      const [year, month] = val.split('-');
+      const formatted = `${month}/01/${year}`;
+      const display = `${MONTH_NAMES[parseInt(month) - 1]} ${year}`;
       collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
