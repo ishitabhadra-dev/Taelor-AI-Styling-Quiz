@@ -1661,8 +1661,80 @@
     scrollBottom();
   }
 
+  // ── Body shape image map ─────────────────────────────────────────────────
+  const BODY_SHAPE_IMAGES = {
+    'Slim':                                  'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/slim.png?v=1692997550',
+    'Narrow shoulders, wider hips':          'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/narrow_shoulder_wide_hips.png?v=1692997549',
+    'Shoulders, mid-section & hips even':    'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/even_shoulder_hips.png?v=1692997550',
+    'Broad shoulders, narrow hips':          'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/broad_shoulder_narrow_hips.png?v=1692997550',
+    'Broad shoulders, even midsection & hips':'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/broad_shoulder_even_hips.png?v=1692997550',
+    'Wider waist':                           'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/wide_waist.png?v=1692997549',
+  };
+
+  // ── Body shape image cards ───────────────────────────────────────────────
+  function renderBodyShapeCards(widget) {
+    const outer = document.createElement('div');
+    outer.className = 'msg ai';
+    const wrap = document.createElement('div');
+    wrap.className = 'widget-wrap';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'widget-label';
+    lbl.innerHTML = `${widget.question}<span style="color:#e53e3e;margin-left:4px;" title="Required">*</span>`;
+    wrap.appendChild(lbl);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;';
+
+    let selected = null;
+
+    widget.options.filter(o => o !== 'Other').forEach(opt => {
+      const card = document.createElement('div');
+      card.style.cssText = 'border:2px solid var(--color-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.15s;background:var(--color-soft);text-align:center;';
+      const imgSrc = BODY_SHAPE_IMAGES[opt] || '';
+      card.innerHTML = `
+        ${imgSrc ? `<img src="${imgSrc}" alt="${opt}" style="width:100%;height:120px;object-fit:contain;background:#fff;display:block;">` : ''}
+        <div style="padding:6px 4px 8px;font-size:12px;font-weight:600;color:var(--color-text);line-height:1.3;">${opt}</div>
+      `;
+      card.addEventListener('click', () => {
+        grid.querySelectorAll('div[data-body-card]').forEach(c => {
+          c.style.borderColor = 'var(--color-border)';
+          c.style.boxShadow = '';
+        });
+        card.style.borderColor = 'var(--color-accent)';
+        card.style.boxShadow = '0 0 0 1px var(--color-accent)';
+        selected = opt;
+        confirmBtn.disabled = false;
+      });
+      card.dataset.bodyCard = '1';
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'confirm-btn';
+    confirmBtn.textContent = 'Confirm';
+    confirmBtn.disabled = true;
+    confirmBtn.addEventListener('click', async () => {
+      if (!selected) return;
+      collapseWidget(outer, widget.question);
+      addMessage(selected, 'user');
+      isWaitingForWidget = false;
+      await submitWidget({ field: widget.field, value: selected, tool_use_id: widget.tool_use_id });
+    });
+    wrap.appendChild(confirmBtn);
+
+    outer.appendChild(wrap);
+    messagesEl.appendChild(outer);
+    scrollBottom();
+  }
+
   // ── Chips ────────────────────────────────────────────────────────────────
   function renderChips(widget) {
+    // Body shape: render image cards instead of text chips
+    if (widget.field === 'bodyShape') {
+      return renderBodyShapeCards(widget);
+    }
     const wrap = document.createElement('div');
     wrap.className = 'widget-wrap';
 
@@ -3027,7 +3099,7 @@
 
     // Dropdown list (shows matched known brands)
     const dropdown = document.createElement('div');
-    dropdown.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);z-index:50;display:none;max-height:240px;overflow-y:auto;overflow-x:hidden;';
+    dropdown.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--color-bg);border:1.5px solid var(--color-border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.20);z-index:50;display:none;max-height:240px;overflow-y:auto;overflow-x:hidden;';
     searchWrap.appendChild(dropdown);
     wrap.appendChild(searchWrap);
 
@@ -3071,12 +3143,12 @@
         if (matches.length) {
           matches.forEach(brand => {
             const row = document.createElement('div');
-            row.style.cssText = 'padding:11px 15px;cursor:pointer;font-size:14px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:8px;transition:background 0.1s;';
-            row.addEventListener('mouseenter', () => row.style.background = '#f8f8f8');
+            row.style.cssText = 'padding:11px 15px;cursor:pointer;font-size:14px;color:var(--color-text);border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:8px;transition:background 0.1s;';
+            row.addEventListener('mouseenter', () => row.style.background = 'var(--color-soft)');
             row.addEventListener('mouseleave', () => row.style.background = '');
             // Bold matching portion
             const idx = brand.toLowerCase().indexOf(q);
-            row.innerHTML = `<span style="font-size:13px;opacity:0.5;">↗</span>` +
+            row.innerHTML = `<span style="font-size:13px;color:var(--color-muted);">↗</span>` +
               `<span>` +
               brand.substring(0, idx) +
               `<strong style="font-weight:700;">${brand.substring(idx, idx + q.length)}</strong>` +
@@ -3505,7 +3577,7 @@
       sendMessage('');
       return;
     } else if (data.type === 'widget') {
-      if (data.sectionHeader) renderSectionHeader(data.sectionHeader.title, data.sectionHeader.subtitle);
+      if (data.sectionHeader && data.widget?.field !== 'bodyShape') renderSectionHeader(data.sectionHeader.title, data.sectionHeader.subtitle);
       if (data.text) addMessage(data.text, 'ai');
       renderWidget(data.widget);
     } else if (data.type === 'finished') {
