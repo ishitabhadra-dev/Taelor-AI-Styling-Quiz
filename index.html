@@ -475,6 +475,7 @@
     .outfit-photo {
       width: 100%;
       aspect-ratio: 3 / 4;
+      max-height: 200px;
       object-fit: cover;
       object-position: center top;
       display: block;
@@ -1447,6 +1448,25 @@
 
   function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 
+  // Replace widget DOM element with a persistent AI question bubble so the
+  // chat log remains readable after submission.
+  function collapseWidget(el, question) {
+    if (!el) return;
+    if (!question) { el.remove(); return; }
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ai';
+    const b = document.createElement('div');
+    b.className = 'bubble ai';
+    b.textContent = question;
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.textContent = `Taelor • ${time}`;
+    wrap.appendChild(b);
+    wrap.appendChild(meta);
+    el.replaceWith(wrap);
+  }
+
   function addMessage(text, role) {
     if (!text) return;
 
@@ -1625,7 +1645,7 @@
         errEl.style.display = 'block';
         return;
       }
-      outer.remove();
+      collapseWidget(outer, 'What does your lifestyle look like?');
       addMessage(selectedLifestyle, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -1737,7 +1757,7 @@
         ? (value.length ? value.join(', ') : 'Skipped')
         : (value || 'Skipped');
 
-      wrap.closest('.msg')?.remove() || wrap.remove();
+      collapseWidget(wrap.closest('.msg') || wrap, widget.question);
       addMessage(displayText, 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value, tool_use_id: widget.tool_use_id });
@@ -1752,7 +1772,7 @@
       skipBtn.textContent = 'Skip, let my stylist decide';
       skipBtn.addEventListener('click', async () => {
         const skipValue = widget.select_type === 'multi' ? [] : '';
-        wrap.closest('.msg')?.remove() || wrap.remove();
+        collapseWidget(wrap.closest('.msg') || wrap, widget.question);
         addMessage('Skipped', 'user');
         isWaitingForWidget = false;
         await submitWidget({ field: widget.field, value: skipValue, tool_use_id: widget.tool_use_id });
@@ -1787,36 +1807,35 @@
     wrap.appendChild(errEl);
 
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px;';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;';
 
     let selectedOpt = null;
 
-    const FIT_IMGS = {
-      'Slim':    '<img src="/fit-slim.png"    alt="Slim fit"    style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
-      'Regular': '<img src="/fit-regular.png" alt="Regular fit" style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
-      'Relaxed': '<img src="/fit-relaxed.png" alt="Relaxed fit" style="width:90px;height:110px;object-fit:contain;display:block;margin:0 auto;">',
+    const FIT_IMG_SRC = {
+      'Slim':    '/fit-slim.png',
+      'Regular': '/fit-regular.png',
+      'Relaxed': '/fit-relaxed.png',
     };
 
     widget.options.forEach((opt, i) => {
       const desc = widget.descriptions?.[i] || '';
-      const img = FIT_IMGS[opt] || '';
+      const src  = FIT_IMG_SRC[opt] || '';
       const card = document.createElement('div');
-      card.style.cssText = 'border:2px solid var(--color-border);border-radius:12px;padding:14px 10px 12px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--color-soft);';
+      card.style.cssText = 'border:2px solid var(--color-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.15s;background:var(--color-soft);';
       card.innerHTML = `
-        <div style="margin-bottom:8px;">${img}</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--color-text);">${opt}</div>
-        <div style="font-size:11px;color:var(--color-muted);line-height:1.4;">${desc}</div>
+        ${src ? `<img src="${src}" alt="${opt} fit" style="width:100%;height:180px;object-fit:cover;object-position:top;display:block;">` : ''}
+        <div style="padding:10px 12px 12px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:3px;color:var(--color-text);">${opt}</div>
+          <div style="font-size:12px;color:var(--color-muted);line-height:1.4;">${desc}</div>
+        </div>
       `;
       card.addEventListener('click', () => {
         grid.querySelectorAll('div[data-fit-card]').forEach(c => {
-          c.style.borderColor = '#e2e8f0';
-          c.style.background = '#fff';
-          c.style.color = '';
+          c.style.borderColor = 'var(--color-border)';
+          c.style.boxShadow = '';
         });
-        card.style.borderColor = '#B8844A';
-        card.style.background = '#B8844A';
-        card.style.color = '#fff';
-        card.querySelector('div:last-child').style.color = '#aaa';
+        card.style.borderColor = 'var(--color-accent)';
+        card.style.boxShadow = '0 0 0 1px var(--color-accent)';
         selectedOpt = opt;
         errEl.style.display = 'none';
         // Auto-confirm on single select
@@ -1836,7 +1855,7 @@
         errEl.style.display = 'block';
         return;
       }
-      wrap.closest('.msg')?.remove() || wrap.remove();
+      collapseWidget(wrap.closest('.msg') || wrap, widget.question);
       addMessage('✓', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: selectedOpt, tool_use_id: widget.tool_use_id });
@@ -2009,7 +2028,7 @@
         return;
       }
       const display = `Tops: ${topSize} · ${topFit} fit`;
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2174,7 +2193,7 @@
         errEl.style.display = 'block';
         return;
       }
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(`W${waist} / L${inseam}`, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2265,7 +2284,7 @@
     btn.disabled = true;
     btn.addEventListener('click', async () => {
       const value = [...selected];
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(value.length ? `Exclude: ${value.join(', ')}` : 'No exclusions', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value, tool_use_id: widget.tool_use_id });
@@ -2276,7 +2295,7 @@
     skipBtn.className = 'skip-btn';
     skipBtn.textContent = 'I\'m open to everything';
     skipBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Open to all clothing types', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
@@ -2358,25 +2377,27 @@
 
       grid.appendChild(card);
     });
-    wrap.appendChild(grid);
-
+    // "None of these" above the grid so it's visible without scrolling
     const skipBtn = document.createElement('button');
     skipBtn.className = 'skip-btn';
     skipBtn.textContent = 'None of these';
+    skipBtn.style.marginBottom = '10px';
     skipBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('None of these', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: null, tool_use_id: widget.tool_use_id });
     });
     wrap.appendChild(skipBtn);
 
+    wrap.appendChild(grid);
+
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
     btn.textContent = 'Confirm Selection';
     btn.disabled = true;
     btn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
 
       // Show selected outfit thumbnails as the user bubble (no text label)
       const selectedOutfits = widget.outfits.filter(o => selectedIds.has(o.id));
@@ -2480,7 +2501,7 @@
       const summary = prefer.length || avoid.length
         ? [prefer.length ? `Prefer: ${prefer.join(', ')}` : '', avoid.length ? `Avoid: ${avoid.join(', ')}` : ''].filter(Boolean).join(' · ')
         : 'Open to all';
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(summary, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2495,7 +2516,7 @@
     skipColorBtn.className = 'skip-btn';
     skipColorBtn.textContent = 'Skip, open to all colors';
     skipColorBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Open to all colors', 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2587,7 +2608,7 @@
       const summary = prefer.length || avoid.length
         ? [prefer.length ? `Prefer: ${prefer.join(', ')}` : '', avoid.length ? `Avoid: ${avoid.join(', ')}` : ''].filter(Boolean).join(' · ')
         : 'Open to all prints';
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(summary, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2602,7 +2623,7 @@
     skipPrintBtn.className = 'skip-btn';
     skipPrintBtn.textContent = 'Skip, open to all prints';
     skipPrintBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Open to all prints', 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2750,7 +2771,7 @@
       if (printPrefer.length) parts.push(`Prints I like: ${printPrefer.join(', ')}`);
       if (printAvoid.length)  parts.push(`Avoid prints: ${printAvoid.join(', ')}`);
       const summary = parts.length ? parts.join(' · ') : 'Open to everything';
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(summary, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2770,7 +2791,7 @@
     skipBtn.className = 'skip-btn';
     skipBtn.textContent = 'Leave it to my stylist';
     skipBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Open to anything', 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -2874,7 +2895,7 @@
     skipBtn.className = 'skip-btn';
     skipBtn.textContent = 'Skip for now';
     skipBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Skipped photo upload', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
@@ -2886,7 +2907,7 @@
     btn.textContent = 'Submit Photos';
     btn.addEventListener('click', async () => {
       const uploaded = files.filter(Boolean);
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(uploaded.length ? `${uploaded.length} photo${uploaded.length > 1 ? 's' : ''} shared` : 'No photos', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: uploaded, tool_use_id: widget.tool_use_id });
@@ -2931,7 +2952,7 @@
     skipBtn.className = 'skip-btn';
     skipBtn.textContent = 'Skip';
     skipBtn.addEventListener('click', async () => {
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage('Skipped', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: [], tool_use_id: widget.tool_use_id });
@@ -2943,7 +2964,7 @@
     btn.textContent = 'Confirm';
     btn.addEventListener('click', async () => {
       const handles = inputs.map(i => i.value.trim()).filter(Boolean);
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(handles.length ? handles.join(', ') : 'Skipped', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: handles, tool_use_id: widget.tool_use_id });
@@ -3127,7 +3148,7 @@
     btn.textContent = 'Confirm';
     btn.addEventListener('click', async () => {
       const brands = [...selected];
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(brands.length ? brands.join(', ') : 'No preference', 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: brands, tool_use_id: widget.tool_use_id });
@@ -3219,7 +3240,7 @@
 
     confirmBtn.addEventListener('click', async () => {
       const display = `W${selectedW} L${selectedL}`;
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
       await submitWidget({
@@ -3300,7 +3321,7 @@
       const month = monthSel.value;
       const formatted = month ? `${month}/01/${year}` : `01/01/${year}`;
       const display = month ? `${months[parseInt(month)-1]} ${year}` : year;
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
       await submitWidget({ field: widget.field, value: formatted, tool_use_id: widget.tool_use_id });
@@ -3381,7 +3402,7 @@
 
     confirmBtn.addEventListener('click', async () => {
       const display = `${selectedFt}ft ${selectedIn}in`;
-      outer.remove();
+      collapseWidget(outer, widget.question);
       addMessage(display, 'user');
       isWaitingForWidget = false;
       await submitWidget({
