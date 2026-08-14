@@ -747,7 +747,7 @@
     .color-swatch:hover { background: var(--color-soft); }
 
     .swatch-dot {
-      width: 20px; height: 20px;
+      width: 36px; height: 36px;
       border-radius: 50%;
       border: 1.5px solid var(--color-border);
       transition: all 0.15s;
@@ -758,15 +758,15 @@
       font-size: 10px;
     }
 
-    .swatch-dot.prefer { border: 2px solid #16a34a; box-shadow: 0 0 0 1.5px #bbf7d0; }
-    .swatch-dot.avoid  { border: 2px solid #dc2626; box-shadow: 0 0 0 1.5px #fecaca; }
+    .swatch-dot.prefer { border: 2.5px solid #16a34a; box-shadow: 0 0 0 2px #bbf7d0; }
+    .swatch-dot.avoid  { border: 2.5px solid #dc2626; box-shadow: 0 0 0 2px #fecaca; }
 
     .swatch-name {
-      font-size: 7px;
+      font-size: 9px;
       color: var(--color-muted);
       text-align: center;
       line-height: 1.2;
-      max-width: 28px;
+      max-width: 42px;
     }
 
     /* ── Prints picker ───────────────────────────────────────────────────── */
@@ -2547,6 +2547,7 @@
 
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
+    btn.style.cssText = 'width:auto;font-size:13px;padding:9px 22px;';
     btn.textContent = 'Save preferences';
     btn.addEventListener('click', async () => {
       const prefer = Object.entries(state).filter(([,v]) => v === 'prefer').map(([k]) => k);
@@ -2811,7 +2812,7 @@
     // ─ Buttons ─
     const saveBtn = document.createElement('button');
     saveBtn.className = 'confirm-btn';
-    saveBtn.style.marginTop = '10px';
+    saveBtn.style.cssText = 'margin-top:10px;width:auto;font-size:13px;padding:9px 22px;';
     saveBtn.textContent = 'Save preferences';
     saveBtn.addEventListener('click', async () => {
       const colorPrefer = Object.entries(colorState).filter(([,v]) => v === 'prefer').map(([k]) => k);
