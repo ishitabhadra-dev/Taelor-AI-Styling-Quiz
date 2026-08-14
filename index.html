@@ -475,7 +475,7 @@
     .outfit-photo {
       width: 100%;
       aspect-ratio: 3 / 4;
-      max-height: 200px;
+      max-height: clamp(120px, 20vh, 180px);
       object-fit: cover;
       object-position: center top;
       display: block;
@@ -1971,30 +1971,9 @@
     wrap.appendChild(fitHead);
 
     const FIT_CARDS = [
-      {
-        name: 'Slim',
-        desc: 'Close to body',
-        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 92" width="52" height="60" style="display:block;margin:0 auto 4px;">
-          <polygon points="30,14 20,20 4,36 7,46 20,44 26,92 54,92 60,44 73,46 76,36 60,20 50,14 40,27" fill="#4A7CF3"/>
-          <polygon points="34,14 40,25 46,14 43,10 37,10" fill="#2a5bbf" opacity="0.8"/>
-        </svg>`
-      },
-      {
-        name: 'Regular',
-        desc: 'Classic cut',
-        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 92" width="52" height="60" style="display:block;margin:0 auto 4px;">
-          <polygon points="30,14 19,20 2,36 5,46 19,44 19,92 61,92 61,44 75,46 78,36 61,20 50,14 40,27" fill="#4A7CF3"/>
-          <polygon points="34,14 40,25 46,14 43,10 37,10" fill="#2a5bbf" opacity="0.8"/>
-        </svg>`
-      },
-      {
-        name: 'Relaxed',
-        desc: 'Loose & roomy',
-        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 92" width="52" height="60" style="display:block;margin:0 auto 4px;">
-          <polygon points="30,14 18,20 0,36 3,46 18,44 14,92 66,92 62,44 77,46 80,36 62,20 50,14 40,27" fill="#4A7CF3"/>
-          <polygon points="34,14 40,25 46,14 43,10 37,10" fill="#2a5bbf" opacity="0.8"/>
-        </svg>`
-      }
+      { name: 'Slim',    desc: 'Close to body',  img: '/fit-slim.png'    },
+      { name: 'Regular', desc: 'Classic cut',     img: '/fit-regular.png' },
+      { name: 'Relaxed', desc: 'Loose & roomy',  img: '/fit-relaxed.png' },
     ];
 
     const fitRow = document.createElement('div');
@@ -2002,11 +1981,11 @@
     let activeFitBtn = null;
     FIT_CARDS.forEach(card => {
       const btn = document.createElement('button');
-      btn.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:10px 6px 8px;text-align:center;cursor:pointer;background:#fff;flex:1;touch-action:manipulation;transition:all 0.15s;';
-      btn.innerHTML = `${card.svg}<div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:#999;margin-top:2px;line-height:1.3;">${card.desc}</div>`;
+      btn.style.cssText = 'border:2px solid var(--color-border);border-radius:10px;overflow:hidden;text-align:center;cursor:pointer;background:var(--color-soft);flex:1;touch-action:manipulation;transition:all 0.15s;padding:0;';
+      btn.innerHTML = `<img src="${card.img}" alt="${card.name} fit" style="width:100%;height:100px;object-fit:cover;object-position:top;display:block;"><div style="padding:6px 4px 8px;"><div style="font-size:13px;font-weight:600;color:var(--color-text);">${card.name}</div><div style="font-size:10px;color:var(--color-muted);margin-top:2px;line-height:1.3;">${card.desc}</div></div>`;
       btn.addEventListener('click', () => {
-        if (activeFitBtn) { activeFitBtn.style.borderColor='#e2e8f0'; activeFitBtn.style.background='#fff'; }
-        btn.style.borderColor='#B8844A'; btn.style.background='rgba(184,132,74,0.06)';
+        if (activeFitBtn) { activeFitBtn.style.borderColor='var(--color-border)'; activeFitBtn.style.boxShadow=''; }
+        btn.style.borderColor='#B8844A'; btn.style.boxShadow='0 0 0 1px #B8844A';
         activeFitBtn = btn;
         topFit = card.name;
         if (errEl) errEl.style.display = 'none';
@@ -2344,6 +2323,7 @@
       img.className = 'outfit-photo';
       img.alt = outfit.style;
       img.loading = 'lazy';
+      img.onload = scrollBottom;
       img.src = outfit.img;
       img.onerror = () => {
         // Replace with gradient fallback
