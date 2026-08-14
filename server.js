@@ -513,13 +513,26 @@ Use earlier answers to infer later ones. Confirm rather than re-ask from scratch
 =======================================================================
 
 =======================================================================
-QUIZ FLOW — 14 STEPS (~3 minutes)
+QUIZ FLOW — 17 STEPS (~3 minutes)
 =======================================================================
 
 STEP 1 — LIFESTYLE
 On the first turn, call present_lifestyle_occasions immediately. No text message before it — the app shows the welcome.
 This shows a single lifestyle question. Occasions are inferred from the lifestyle answer — do NOT ask about occasions separately.
 Widget returns: lifestyle (required).
+
+STEP 1b — NEEDS (what brings them here)
+Immediately after saving lifestyle, call present_options with NO intro text:
+  question="What brings you to Taelor?"
+  options=["Need more work clothes","Need more casual clothes","Want to save time","Don't know what to shop for","Want more variety in my closet","Need personal styling advice","Want to save money","Want to be more sustainable"]
+  select_type="multi", field="customerNeeds", is_required=false
+
+STEP 1c — INDUSTRY
+Immediately after saving customerNeeds, call present_options with NO intro text:
+  question="Which industry do you work in?"
+  options=["Technology & IT","Finance & banking","Marketing & advertising","Health care","Legal services","Education","Art & entertainment","Retail & e-commerce","Real estate","Travel & hospitality","News & media","Other"]
+  select_type="single", field="industry", is_required=false
+  other_placeholder="What field are you in?"
 
 STEP 2 — PHONE NUMBER
 Ask naturally. Frame it as connecting them with their stylist, not filling out a form. Example:
@@ -602,6 +615,14 @@ STEP 13b — SOCIAL MEDIA (optional)
 Call present_social_handles:
   question="Drop your socials if you want — it helps your stylist get a feel for your vibe."
 field="socialMediaHandles". This is completely optional. If they decline or skip, move on immediately.
+
+STEP 13c — REFERRAL SOURCE (optional)
+Immediately after social handles, call present_options with NO intro text:
+  question="Last one — where did you hear about us?"
+  options=["Friend or family","Instagram","Facebook","Google / Search","LinkedIn","TikTok","YouTube","X (Twitter)","News or blog article","Email","Event","Other"]
+  select_type="single", field="referralSource", is_required=false
+  other_placeholder="How'd you find us?"
+→ After saving, move to STEP 14.
 
 STEP 14 — STYLE PROFILE ASSIGNMENT + FINISH
 Call update_profile with field="styleProfile" and assign the closest archetype based on lifestyle, occasions, impression, outfit picks, and brands:
@@ -881,6 +902,8 @@ function translateProfile(raw) {
     doNotWant:            'topsDislike',
     otherAdvice:          'stylistRequest',
     currentRole:          'role',
+    customerNeeds:        'signUpReason',
+    industry:             'industryOfWork',
     platforms:            'platform',
     topics:               'interestedTopic',
     favoriteShows:        'favoriteThings',
