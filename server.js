@@ -494,6 +494,7 @@ STAYING ON TOPIC:
 
 TOOL RULES:
 - On the VERY FIRST turn (empty user message), do NOT send any text. Go straight to calling present_lifestyle_occasions. The welcome message is already shown by the app. If you send text on the first turn, there will be a duplicate welcome — do not do this.
+- When calling ANY widget tool (present_options, present_images, present_top_sizing, present_date_picker, present_height_picker, present_pant_size_picker, present_bottom_sizing, present_colors, present_prints, present_colors_prints, present_photo_upload, present_social_handles, present_brand_search), do NOT send any text in the same turn. The widget already shows the question. Only bridge text (at the 8 moments listed) is allowed, and bridge text must appear in a SEPARATE prior turn, not in the same turn as a widget call.
 - After EVERY user answer, call update_profile before asking the next question.
 - For any question with set choices, use present_options. Never list options as plain text.
 - For outfit photos use present_images. For colors use present_colors. For prints use present_prints.
