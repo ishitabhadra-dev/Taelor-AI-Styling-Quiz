@@ -590,7 +590,7 @@ STEP 12 — CLOTHING TO AVOID (optional)
 Say: "Last one. Skip if nothing stands out."
 Call present_options:
   question="Anything we should never send you?"
-  options=["No shorts","No activewear","No blazers or formal suiting","No knitwear (sweaters & cardigans)","No graphic tees","No outerwear (coats & jackets)"]
+  options=["Shorts","Activewear","Blazers","Cardigan","Henleys","Polos","Shacket","Sweatshirts","T-Shirts","Vest","Hoodie"]
   select_type="multi", field="doNotWant"
 → After saving, say BRIDGE [B6].
 

@@ -412,7 +412,8 @@
     .garment-img {
       width: 100%;
       aspect-ratio: 1;
-      object-fit: cover;
+      object-fit: contain;
+      background: #fff;
       background: var(--color-soft);
       display: block;
     }
@@ -1422,26 +1423,18 @@
   ];
 
   // ── Garment images ─────────────────────────────────────────────────────
-  // Replace with Taelor CDN URLs for production
   const GARMENT_IMAGES = {
-    'Shorts':                 'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=200&h=200&fit=crop&auto=format',
-    'Pants':                  'https://images.unsplash.com/photo-1624378440560-20840aed71bc?w=200&h=200&fit=crop&auto=format',
-    'Blazers':                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format',
-    'Cardigan':               'https://images.unsplash.com/photo-1551537258-edf41e926082?w=200&h=200&fit=crop&auto=format',
-    'Sweater':                'https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=200&h=200&fit=crop&auto=format',
-    'Long Sleeve Button Up':  'https://images.unsplash.com/photo-1587152332734-e7cb4e1d1a99?w=200&h=200&fit=crop&auto=format',
-    'Short Sleeve Button Up': 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=200&h=200&fit=crop&auto=format',
-    'Business Button Up':     'https://images.unsplash.com/photo-1541417557177-8fb47cb24424?w=200&h=200&fit=crop&auto=format',
-    'Henleys':                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=200&h=200&fit=crop&auto=format',
-    'Jackets':                'https://images.unsplash.com/photo-1624378440560-20840aed71bc?w=200&h=200&fit=crop&auto=format',
-    'Polos':                  'https://images.unsplash.com/photo-1473966604640-70b2d4a27eb4?w=200&h=200&fit=crop&auto=format',
-    'Shacket':                'https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?w=200&h=200&fit=crop&auto=format',
-    'Sweatshirts':            'https://images.unsplash.com/photo-1548372290-8d01b6c8e78c?w=200&h=200&fit=crop&auto=format',
-    'T-Shirts':               'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=200&h=200&fit=crop&auto=format',
-    'Vest':                   'https://images.unsplash.com/photo-1535268244-70f0b00e7d4a?w=200&h=200&fit=crop&auto=format',
-    'Coat':                   'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop&auto=format',
-    'Hoodie':                 'https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=200&h=200&fit=crop&auto=format',
-    'Activewear':             'https://images.unsplash.com/photo-1517438476312-10d79c077509?w=200&h=200&fit=crop&auto=format',
+    'Shorts':      'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/quiz_short.jpg?v=1723992168',
+    'Activewear':  'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Activewear.png?v=1693193051',
+    'Blazers':     'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/blazers.png?v=1693193052',
+    'Cardigan':    'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Cardigan.png?v=1693193052',
+    'Henleys':     'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Henleys.png?v=1693193052',
+    'Polos':       'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Polos.png?v=1693193051',
+    'Shacket':     'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/shacket_1.png?v=1697054573',
+    'Sweatshirts': 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Sweatshirts.png?v=1693193051',
+    'T-Shirts':    'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/T-Shirts.png?v=1693193051',
+    'Vest':        'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Vest.png?v=1693193051',
+    'Hoodie':      'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/Hoodie.png?v=1693193051',
   };
 
   // ── Helpers ─────────────────────────────────────────────────────────────
@@ -1734,6 +1727,10 @@
     // Body shape: render image cards instead of text chips
     if (widget.field === 'bodyShape') {
       return renderBodyShapeCards(widget);
+    }
+    // Garments to avoid: render image grid instead of text chips
+    if (widget.field === 'doNotWant') {
+      return renderGarmentGrid(widget);
     }
     const wrap = document.createElement('div');
     wrap.className = 'widget-wrap';
@@ -2332,7 +2329,8 @@
 
     const btn = document.createElement('button');
     btn.className = 'confirm-btn';
-    btn.textContent = 'Confirm';
+    btn.style.cssText = 'width:auto;font-size:13px;padding:9px 22px;';
+    btn.textContent = 'Confirm selection';
     btn.disabled = true;
     btn.addEventListener('click', async () => {
       const value = [...selected];
