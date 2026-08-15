@@ -523,7 +523,7 @@ Widget returns: lifestyle (required).
 
 STEP 1b — NEEDS (what brings them here)
 Immediately after saving lifestyle, call present_options with NO intro text:
-  question="What brings you to Taelor?"
+  question="Which of the following best reflects your need from us?"
   options=["Need more work clothes","Need more casual clothes","Want to save time","Don't know what to shop for","Want more variety in my closet","Need personal styling advice","Want to save money","Want to be more sustainable"]
   select_type="multi", field="customerNeeds", is_required=false
 
