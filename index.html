@@ -1124,6 +1124,14 @@
       .color-grid { grid-template-columns: repeat(5, 1fr); }
       .prints-grid { grid-template-columns: repeat(3, 1fr); }
     }
+
+    /* ── Small confirm variant — beats mobile override ───────────────────── */
+    .confirm-btn-sm {
+      width: auto !important;
+      font-size: 13px !important;
+      padding: 9px 22px !important;
+      min-height: unset !important;
+    }
   </style>
 </head>
 <body>
@@ -2328,8 +2336,7 @@
     wrap.appendChild(grid);
 
     const btn = document.createElement('button');
-    btn.className = 'confirm-btn';
-    btn.style.cssText = 'width:auto;font-size:13px;padding:9px 22px;';
+    btn.className = 'confirm-btn confirm-btn-sm';
     btn.textContent = 'Confirm selection';
     btn.disabled = true;
     btn.addEventListener('click', async () => {
@@ -2544,8 +2551,7 @@
     wrap.appendChild(grid);
 
     const btn = document.createElement('button');
-    btn.className = 'confirm-btn';
-    btn.style.cssText = 'width:auto;font-size:13px;padding:9px 22px;';
+    btn.className = 'confirm-btn confirm-btn-sm';
     btn.textContent = 'Save preferences';
     btn.addEventListener('click', async () => {
       const prefer = Object.entries(state).filter(([,v]) => v === 'prefer').map(([k]) => k);
@@ -2809,8 +2815,8 @@
 
     // ─ Buttons ─
     const saveBtn = document.createElement('button');
-    saveBtn.className = 'confirm-btn';
-    saveBtn.style.cssText = 'margin-top:10px;width:auto;font-size:13px;padding:9px 22px;';
+    saveBtn.className = 'confirm-btn confirm-btn-sm';
+    saveBtn.style.marginTop = '10px';
     saveBtn.textContent = 'Save preferences';
     saveBtn.addEventListener('click', async () => {
       const colorPrefer = Object.entries(colorState).filter(([,v]) => v === 'prefer').map(([k]) => k);
