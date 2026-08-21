@@ -1358,89 +1358,27 @@
   ];
 
   // ── Prints ─────────────────────────────────────────────────────────────
-  // Each print has a CSS background for the circular swatch
+  const CDN = 'https://cdn.shopify.com/s/files/1/0497/2871/6962/files/';
   const PRINTS = [
-    {
-      name: 'Vertical Stripes',
-      bg: 'repeating-linear-gradient(90deg, #222 0px, #222 3px, #f5f5f5 3px, #f5f5f5 14px)'
-    },
-    {
-      name: 'Pinstripes',
-      bg: 'repeating-linear-gradient(160deg, #555 0px, #555 1px, #f0f0f0 1px, #f0f0f0 8px)'
-    },
-    {
-      name: 'Horizontal Stripes',
-      bg: 'repeating-linear-gradient(0deg, #222 0px, #222 3px, #f5f5f5 3px, #f5f5f5 14px)'
-    },
-    {
-      name: 'Polka Dot',
-      bg: 'radial-gradient(circle, #333 20%, transparent 20%) 0 0 / 12px 12px, radial-gradient(circle, #333 20%, transparent 20%) 6px 6px / 12px 12px, #f5f5f5'
-    },
-    {
-      name: 'Plaid',
-      bg: 'repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(30,80,170,0.35) 8px, rgba(30,80,170,0.35) 10px), repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(30,80,170,0.35) 8px, rgba(30,80,170,0.35) 10px), repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(200,40,40,0.3) 18px, rgba(200,40,40,0.3) 20px), repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(200,40,40,0.3) 18px, rgba(200,40,40,0.3) 20px), #d9c98a'
-    },
-    {
-      name: 'Gingham',
-      bg: 'repeating-linear-gradient(0deg, transparent, transparent 9px, rgba(30,80,160,0.25) 9px, rgba(30,80,160,0.25) 10px), repeating-linear-gradient(90deg, transparent, transparent 9px, rgba(30,80,160,0.25) 9px, rgba(30,80,160,0.25) 10px), #dde8f5'
-    },
-    {
-      name: 'Houndstooth',
-      bg: 'conic-gradient(#222 90deg, #f0f0f0 90deg 180deg, #222 180deg 270deg, #f0f0f0 270deg) 0 0 / 12px 12px'
-    },
-    {
-      name: 'Argyle',
-      bg: 'repeating-linear-gradient(45deg, #1a3a6e 0, #1a3a6e 2px, transparent 0, transparent 50%), repeating-linear-gradient(-45deg, #1a3a6e 0, #1a3a6e 2px, transparent 0, transparent 50%), #d4c8a8'
-    },
-    {
-      name: 'Geometric',
-      bg: 'repeating-linear-gradient(60deg, transparent, transparent 10px, #666 10px, #666 12px), repeating-linear-gradient(-60deg, transparent, transparent 10px, #666 10px, #666 12px), #e8e8e8'
-    },
-    {
-      name: 'Camo',
-      bg: 'radial-gradient(ellipse 24px 18px at 20% 25%, #4a5e2a 100%, transparent), radial-gradient(ellipse 18px 14px at 70% 60%, #6b7c3a 100%, transparent), radial-gradient(ellipse 20px 16px at 45% 80%, #3d4e1e 100%, transparent), #8a9a58'
-    },
-    {
-      name: 'Statement Floral',
-      bg: 'radial-gradient(ellipse 14px 18px at 50% 50%, #c0392b 100%, transparent), radial-gradient(ellipse 8px 10px at 20% 20%, #e74c3c 100%, transparent), radial-gradient(ellipse 8px 10px at 80% 80%, #e74c3c 100%, transparent), radial-gradient(circle 4px at 50% 50%, #f8c471 100%, transparent), #2d5a1b'
-    },
-    {
-      name: 'Micro Floral',
-      bg: 'radial-gradient(circle 3px at 25% 25%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 75% 25%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 50% 65%, #9c27b0 100%, transparent), radial-gradient(circle 3px at 25% 75%, #e91e8c 100%, transparent), radial-gradient(circle 3px at 75% 75%, #9c27b0 100%, transparent), #fff5fb'
-    },
-    {
-      name: 'Tropical',
-      bg: 'radial-gradient(ellipse 20px 26px at 30% 40%, #1b8a4e 100%, transparent), radial-gradient(ellipse 16px 20px at 70% 60%, #27ae60 100%, transparent), radial-gradient(circle 6px at 50% 20%, #f39c12 100%, transparent), #87ceeb'
-    },
-    {
-      name: 'Abstract',
-      bg: 'radial-gradient(ellipse 20px 15px at 30% 35%, #3498db 80%, transparent), radial-gradient(ellipse 15px 20px at 70% 65%, #e74c3c 80%, transparent), radial-gradient(circle 12px at 55% 30%, #f1c40f 80%, transparent), #f8f8f8'
-    },
-    {
-      name: 'Animal',
-      bg: 'repeating-linear-gradient(40deg, #333 0, #333 4px, #b8860b 4px, #b8860b 12px, #333 12px, #333 16px, #b8860b 16px, #b8860b 22px)'
-    },
-    {
-      name: 'Paisley',
-      bg: 'radial-gradient(ellipse 16px 22px at 50% 45%, #8b0000 80%, transparent), radial-gradient(circle 5px at 50% 20%, #d4a017 100%, transparent), radial-gradient(ellipse 8px 12px at 65% 58%, #1a3a6e 70%, transparent), #c8a870'
-    },
-    {
-      name: 'Graphic',
-      bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
-    },
-    {
-      name: 'Logo',
-      bg: '#1a1a2e',
-      text: 'K',
-      textColor: '#fff'
-    },
-    {
-      name: 'Solid Only',
-      bg: '#ffffff',
-      border: true,
-      text: '○',
-      textColor: '#ccc'
-    },
+    { name: 'Vertical Stripes',   img: CDN + 'Style-Quiz-Vertical_Stripes.png?v=1694412949'    },
+    { name: 'Pinstripes',         img: CDN + 'Style-Quiz-Pinstripes_4.png?v=1694413142'        },
+    { name: 'Horizontal Stripes', img: CDN + 'Style-Quiz-Horizontal_Stripes_2.png?v=1694413987' },
+    { name: 'Polka Dot',          img: CDN + 'Style-Quiz-Polka_Dot.png?v=1694414375'           },
+    { name: 'Plaid',              img: CDN + 'Style-Quiz-Plaid.png?v=1694414660'               },
+    { name: 'Gingham',            img: CDN + 'Style-Quiz-Gingham.png?v=1694414975'             },
+    { name: 'Houndstooth',        img: CDN + 'Style-Quiz-Houndstooth.png?v=1694415274'         },
+    { name: 'Argyle',             img: CDN + 'Style-Quiz-Argyle.png?v=1694415516'              },
+    { name: 'Geometric',          img: CDN + 'Style-Quiz-Geometric.png?v=1694416111'           },
+    { name: 'Camo',               img: CDN + 'Style-Quiz-Camo.png?v=1694416586'               },
+    { name: 'Statement Floral',   img: CDN + 'Style-Quiz-Statement_Floral.png?v=1694416681'    },
+    { name: 'Micro Floral',       img: CDN + 'Style-Quiz-Micro_Floral.png?v=1694417326'        },
+    { name: 'Tropical',           img: CDN + 'Style-Quiz-Tropical.png?v=1694417376'            },
+    { name: 'Abstract',           img: CDN + 'Style-Quiz-Abstract.png?v=1694417582'            },
+    { name: 'Animal',             img: CDN + 'Style-Quiz-Animal.png?v=1694417510'              },
+    { name: 'Paisley',            img: CDN + 'Style-Quiz-Paisley.png?v=1694417455'             },
+    { name: 'Graphic',            img: CDN + 'Style-Quiz-Graphic.png?v=1694415910'             },
+    { name: 'Logo',               img: CDN + 'Style-Quiz-Logo.png?v=1694412582'               },
+    { name: 'Solid Only',         img: CDN + 'Style-Quiz-Solid_Color.png?v=1694417637'         },
   ];
 
   // ── Garment images ─────────────────────────────────────────────────────
@@ -1916,7 +1854,7 @@
         ${src ? `<img src="${src}" alt="${opt} fit" style="width:100%;height:180px;object-fit:contain;background:#fff;display:block;">` : ''}
         <div style="padding:10px 12px 12px;">
           <div style="font-size:15px;font-weight:700;margin-bottom:3px;color:var(--color-text);">${opt}</div>
-          <div style="font-size:12px;color:var(--color-muted);line-height:1.4;">${desc}</div>
+          <div style="font-size:12px;color:var(--color-text);opacity:0.75;line-height:1.4;">${desc}</div>
         </div>
       `;
       card.addEventListener('click', () => {
@@ -2230,19 +2168,23 @@
       card.innerHTML = `
         <img src="${fit.img}" alt="${fit.name}" style="width:100%;height:120px;object-fit:contain;background:#fff;display:block;">
         <div style="padding:6px 4px 8px;">
-          <div style="font-size:11px;font-weight:600;margin-bottom:3px;color:var(--color-text);">${fit.name}</div>
-          <div style="font-size:10px;color:var(--color-muted);line-height:1.3;">${fit.desc}</div>
+          <div class="fit-card-name" style="font-size:11px;font-weight:600;margin-bottom:3px;color:var(--color-text);">${fit.name}</div>
+          <div class="fit-card-desc" style="font-size:10px;color:var(--color-text);opacity:0.7;line-height:1.3;">${fit.desc}</div>
         </div>
       `;
       card.addEventListener('click', () => {
         if (activePantFitCard) {
-          activePantFitCard.style.borderColor = '#e2e8f0';
-          activePantFitCard.style.background = '#fff';
-          activePantFitCard.querySelector('div:nth-child(2)').style.color = '#333';
+          activePantFitCard.style.borderColor = 'var(--color-border)';
+          activePantFitCard.style.background = 'var(--color-soft)';
+          activePantFitCard.querySelector('.fit-card-name').style.color = 'var(--color-text)';
+          activePantFitCard.querySelector('.fit-card-desc').style.color = 'var(--color-text)';
+          activePantFitCard.querySelector('.fit-card-desc').style.opacity = '0.7';
         }
-        card.style.borderColor = '#B8844A';
-        card.style.background = '#fdf8f3';
-        card.querySelector('div:nth-child(2)').style.color = '#B8844A';
+        card.style.borderColor = 'var(--color-accent)';
+        card.style.background = 'var(--color-soft)';
+        card.querySelector('.fit-card-name').style.color = 'var(--color-accent)';
+        card.querySelector('.fit-card-desc').style.color = 'var(--color-text)';
+        card.querySelector('.fit-card-desc').style.opacity = '0.85';
         activePantFitCard = card;
         pantFit = fit.name;
         errEl.style.display = 'none';
@@ -2375,7 +2317,10 @@
     wrap.appendChild(btn);
     outer.appendChild(wrap);
     messagesEl.appendChild(outer);
-    scrollBottom();
+    // Scroll to TOP of widget so question is visible (grid is taller than viewport)
+    requestAnimationFrame(() => {
+      outer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   // ── Image selector (outfit rounds) ───────────────────────────────────────
@@ -2634,14 +2579,11 @@
 
       const swatch = document.createElement('div');
       swatch.className = 'print-swatch';
-      swatch.style.background = print.bg;
-      if (print.border) swatch.style.border = '1.5px solid #ddd';
-      if (print.text) {
-        swatch.textContent = print.text;
-        swatch.style.color = print.textColor || '#333';
-        swatch.style.fontSize = '18px';
-        swatch.style.fontWeight = '700';
-      }
+      const swatchImg = document.createElement('img');
+      swatchImg.src = print.img;
+      swatchImg.alt = print.name;
+      swatchImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+      swatch.appendChild(swatchImg);
 
       const label = document.createElement('div');
       label.className = 'print-label';
@@ -2791,9 +2733,11 @@
       item.className = 'print-item';
       const swatch = document.createElement('div');
       swatch.className = 'print-swatch';
-      swatch.style.background = print.bg;
-      if (print.border) swatch.style.border = '1.5px solid #ddd';
-      if (print.text) { swatch.textContent = print.text; swatch.style.color = print.textColor || '#333'; swatch.style.fontSize = '18px'; swatch.style.fontWeight = '700'; }
+      const pImg = document.createElement('img');
+      pImg.src = print.img;
+      pImg.alt = print.name;
+      pImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+      swatch.appendChild(pImg);
       const label = document.createElement('div');
       label.className = 'print-label';
       label.textContent = print.name;
@@ -3083,11 +3027,6 @@
     const wrap = document.createElement('div');
     wrap.className = 'widget-wrap';
 
-    const lbl = document.createElement('div');
-    lbl.className = 'widget-label';
-    lbl.textContent = widget.question;
-    wrap.appendChild(lbl);
-
     addTip(wrap, 'favoriteBrands');
 
     // Selected chips
@@ -3107,6 +3046,10 @@
     searchInput.setAttribute('autocomplete', 'off');
     searchInput.setAttribute('autocorrect', 'off');
     searchInput.setAttribute('spellcheck', 'false');
+    searchInput.setAttribute('data-lpignore', 'true');
+    searchInput.setAttribute('data-form-type', 'other');
+    searchInput.setAttribute('data-1p-ignore', '');
+    searchInput.setAttribute('data-bwignore', '');
     searchInput.style.cssText = 'width:100%;box-sizing:border-box;padding-right:80px;';
     searchWrap.appendChild(searchInput);
 

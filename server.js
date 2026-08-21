@@ -605,7 +605,7 @@ Call present_options:
   question="Anything we should never send you?"
   options=["Shorts","Activewear","Blazers","Cardigan","Henleys","Polos","Shacket","Sweatshirts","T-Shirts","Vest","Hoodie"]
   select_type="multi", field="doNotWant"
-→ After saving, say BRIDGE [B6].
+→ After saving, say BRIDGE [B6], then IMMEDIATELY ask STEP 13 in the same message. Do NOT wait for user input between the bridge and STEP 13.
 
 STEP 13 — FIRST SHIPMENT REQUEST (optional)
 Ask: "Any special requests for your first shipment?" Free text. field="firstShipmentRequest"
@@ -1064,6 +1064,44 @@ async function runTurn(session, userMessage) {
       } else if (name === 'finish_quiz') {
         toolResponses.push({ role: 'tool', tool_call_id, content: 'Quiz complete.' });
         for (const tr of toolResponses) session.messages.push(tr);
+
+        // ── Submit completed profile to Taelor backend ─────────────────────
+        if (session.customerId) {
+          try {
+            const payload = {
+              author:               session.customerName || session.customerEmail || 'Taelor Customer',
+              email:                session.customerEmail || '',
+              shopify_customer_id:  session.customerId,
+              stylingQuizJSON: {
+                isComplete: true,
+                ...translateProfile(session.profile),
+              },
+            };
+            const tRes = await fetch(
+              `https://bff.taelor.co/shopify/customer/${session.customerId}/new-quiz`,
+              {
+                method:  'POST',
+                headers: {
+                  'Content-Type':            'application/json',
+                  'X-Shopify-Customer-Email': session.customerEmail || '',
+                  'X-Shopify-Customer-Id':    String(session.customerId),
+                },
+                body: JSON.stringify(payload),
+              }
+            );
+            if (tRes.ok) {
+              console.log('[TAELOR] Quiz submitted ✓ customer', session.customerId);
+            } else {
+              const errText = await tRes.text().catch(() => '');
+              console.error('[TAELOR] Submit failed', tRes.status, errText);
+            }
+          } catch (err) {
+            console.error('[TAELOR] Submit error:', err.message);
+          }
+        } else {
+          console.warn('[TAELOR] No customerId in session — quiz data not submitted.');
+        }
+
         return { type: 'finished', text: args.closing_message };
 
       } else {
@@ -1201,6 +1239,11 @@ app.post('/api/chat', async (req, res) => {
   const cleanMessage = message ? sanitizeInput(message) : null;
 
   const session = await getSession(sessionId);
+
+  // Store customer identity if provided (sent on first call via URL params)
+  if (req.body.customerId)    session.customerId    = req.body.customerId;
+  if (req.body.customerEmail) session.customerEmail = req.body.customerEmail;
+  if (req.body.customerName)  session.customerName  = req.body.customerName;
 
   // 1. Abuse check — block before hitting the model
   if (isAbusive(cleanMessage)) {
