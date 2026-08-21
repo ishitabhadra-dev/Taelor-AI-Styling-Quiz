@@ -1212,6 +1212,18 @@
   let SESSION_ID = makeSessionId();
   localStorage.setItem(STORAGE_KEY, SESSION_ID);
 
+  // ── Customer identity from URL params ────────────────────────────────────
+  // Usage: ?customerId=9280979009749&email=you@example.com&name=Your+Name
+  const _urlP = new URLSearchParams(window.location.search);
+  const CUSTOMER_ID    = _urlP.get('customerId') || _urlP.get('customer_id') || null;
+  const CUSTOMER_EMAIL = _urlP.get('email') || null;
+  const CUSTOMER_NAME  = _urlP.get('name')  || null;
+  const _customerMeta  = {
+    ...(CUSTOMER_ID    && { customerId:    CUSTOMER_ID }),
+    ...(CUSTOMER_EMAIL && { customerEmail: CUSTOMER_EMAIL }),
+    ...(CUSTOMER_NAME  && { customerName:  CUSTOMER_NAME }),
+  };
+
   const messagesEl          = document.getElementById('messages');
   const progressFill        = document.getElementById('progress-fill');
   const progressPct         = document.getElementById('progress-pct');
@@ -3548,7 +3560,7 @@
     lastSendArgs = { type: 'chat', text };
     setInputDisabled(true);
     addTyping();
-    const data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: text });
+    const data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: text, ..._customerMeta });
     removeTyping();
     if (data.type === 'error') {
       showErrorWithRetry(data.message, () => sendMessage(text));
@@ -3706,7 +3718,7 @@
       removeTyping();
       setInputDisabled(true);
       addTyping();
-      data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '' });
+      data = await apiFetch('/api/chat', { sessionId: SESSION_ID, message: '', ..._customerMeta });
       removeTyping();
       // Retry if error OR if server returned an empty message (Claude went silent)
       const emptyResponse = data.type === 'message' && !data.text;
